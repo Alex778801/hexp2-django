@@ -108,7 +108,7 @@ LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "Europe/Moscow"
 
-USE_TZ = True
+USE_TZ = False
 
 USE_THOUSAND_SEPARATOR = True
 
