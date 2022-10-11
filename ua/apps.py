@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class UaConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'ua'
+    verbose_name = 'Администрирование пользователей'
