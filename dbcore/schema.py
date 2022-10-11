@@ -4,9 +4,7 @@ from .models import Project
 import graphene
 
 
-class ProjectType(DjangoObjectType):
-    class Meta:
-        model = Project
+class CustomCat:
 
     id = graphene.Int()
     pid = graphene.Int()
@@ -30,6 +28,11 @@ class ProjectType(DjangoObjectType):
 
     def resolve_o(self: Project, info):
         return self.order
+
+
+class ProjectType(DjangoObjectType, CustomCat):
+    class Meta:
+        model = Project
 
 
 class Query(graphene.ObjectType):
