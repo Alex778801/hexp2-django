@@ -40,11 +40,15 @@ INSTALLED_APPS = [
     "django_cleanup",
     "django.contrib.humanize",
     "rangefilter",
+    "graphene_django",
+    "corsheaders",
+
     "ua",
     "dbcore",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -143,3 +147,12 @@ DJANGORESIZED_DEFAULT_KEEP_META = True
 DJANGORESIZED_DEFAULT_FORCE_FORMAT = 'JPEG'
 DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
 DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = False
+
+# GRAPHENE
+GRAPHENE = {
+    'SCHEMA': 'dbcore.schema.schema'
+}
+
+# CORS HEADERS
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = ("http://localhost:8080", )
