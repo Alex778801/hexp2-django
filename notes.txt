@@ -1,0 +1,4 @@
+python3 manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission -e admin.Logentry > bu.json
+scp alex@192.168.1.202:/dj/hexp/bu.json ./Desktop/hexp2/dj/
+loaddata bu.json -i --format json -e ua.userAttr -e ua.UserAction
+------------------------------------------------------------------------------------------------------------------------
