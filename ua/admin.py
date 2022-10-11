@@ -24,7 +24,7 @@ class UserAttrForm(ModelForm):
 
 @admin.register(UserAttr)
 class UserAttrAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'user', 'color', 'color2')
+    list_display = ('pk', 'user', 'color', 'color2', 'openObjectsInNewWindow')
     ordering = ('user', )
     list_filter = ('user', )
     search_fields = ('user__icontains', )
@@ -56,10 +56,8 @@ class UserActionAdmin(admin.ModelAdmin):
     dt.short_description = 'Дата'
 
     def http(self, obj):
-        baseAddress = ''
         if obj.link is not None:
-            # return format_html('<a href="{url}">{url}</a>', url=obj.link)
-            return format_html('<a href="{url}">{url}</a>', url=f'{baseAddress}{obj.link}')
+            return format_html('<a href="{url}">{url}</a>', url=obj.link)
         else:
             return ''
 

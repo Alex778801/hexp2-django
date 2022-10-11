@@ -10,58 +10,50 @@ from functools import reduce
 from django.utils.translation import gettext as _
 import re
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Вспомогательные функции для обработки прав доступа
 
-# # Получить список пользователей из строки
-# def aclParseStr(_str):
-#     return re.split(";|,", _str.replace(' ', ''))
-#
-# # Проверить корректность (существование) имен пользователей в списке доступа
-# def aclCheckUsers(users):
-#     for user in users:
-#         if user != '*' and user != '&':
-#             try:
-#                 User.objects.get(username=user)
-#             except:
-#                 raise Exception(f'СКД {users} содержит несуществующего пользователя "{user}"')
-#
-#
-# # Проверить существование пользователей в списоке контроля доступа
-# def aclUsersExist(aclStr):
-#     users = aclParseStr(aclStr)
-#     for user in users:
-#         if user != '*' and user != '&':
-#             try:
-#                 User.objects.get(username=user)
-#             except:
-#                 return False, user
-#     return True, None
-#
-#
-# # Запаковать списки доступа в словарь
-# def aclPack(readStr, modStr, reportStr):
-#     read = aclParseStr(readStr)
-#     aclCheckUsers(read)
-#     mod = aclParseStr(modStr)
-#     aclCheckUsers(mod)
-#     report = aclParseStr(reportStr)
-#     aclCheckUsers(report)
-#     return {'read': read, 'mod': mod, 'report': report}
-#
-# # Распаковать список доступа из словаря по ключу-домену
-# def aclUnpack(domain):
-#     return reduce(lambda a, b: '' + a + '; ' + b, domain, '')
+# Получить список пользователей из строки
+def aclParseStr(_str):
+    return re.split(";|,", _str.replace(' ', ''))
+
+# Проверить корректность (существование) имен пользователей в списке доступа
+def aclCheckUsers(users):
+    for user in users:
+        if user != '*' and user != '&':
+            try:
+                User.objects.get(username=user)
+            except:
+                raise Exception(f'СКД {users} содержит несуществующего пользователя "{user}"')
 
 
-def aclGetUsersList():
-    list = [{'id': '*', 'label': 'Любой (*)'}, {'id': '&', 'label': 'Владелец (&)'}]
-    userList = User.objects.all()
-    for u in userList:
-        list.append({'id': u.username, 'label': u.username})
-    return list
+# Проверить существование пользователей в списоке контроля доступа
+def aclUsersExist(aclStr):
+    users = aclParseStr(aclStr)
+    for user in users:
+        if user != '*' and user != '&':
+            try:
+                User.objects.get(username=user)
+            except:
+                return False, user
+    return True, None
 
+
+# Запаковать списки доступа в словарь
+def aclPack(readStr, omodStr, amodStr, reportStr):
+    read = aclParseStr(readStr)
+    aclCheckUsers(read)
+    omod = aclParseStr(omodStr)
+    aclCheckUsers(omod)
+    amod = aclParseStr(amodStr)
+    aclCheckUsers(amod)
+    report = aclParseStr(reportStr)
+    aclCheckUsers(report)
+    return {'read': read, 'o_mod': omod,  'a_mod': amod, 'report': report}
+
+# Распаковать список доступа из словаря по ключу-домену
+def aclUnpack(domain):
+    return reduce(lambda a, b: '' + a + '; ' + b, domain)
 
 # Проверить административные привилегии пользователя
 def isAdmin(user):
@@ -73,50 +65,47 @@ def isAdmin(user):
     adminsGrpList = ('Admin', 'admin', 'Administrators', 'administrators')
     if user.groups.filter(name__in=adminsGrpList).exists():
         return True, 'By admins group'
-    return False, ''
-
+    return False
 
 # Проверить ПРАВО
-def aclCheckRights(model, acl, user: User, domain):
+def aclCheckRights(model, user: User, domain):
     # Список доступа по домену
-    aclUnpack = json.loads(acl)
-    if domain in aclUnpack:
-        accessList = aclUnpack[domain]
-    else:
-        accessList = []
-    if accessList is None:
-        accessList = []
+    acl = json.loads(model.acl)
+    aclList =  aclParseStr(aclUnpack(acl[domain]))
     # ВСЕ *
-    if '*' in accessList:
+    if '*' in aclList:
         return True, 'By * (all)'
     # ВЛАДЕЛЕЦ (создатель)
-    if '&' in accessList and user == model.owner:
+    if '&' in aclList and User == model.owner:
         return True, 'By & (owner)'
     # Конкретный пользователь
-    if user.username in accessList:
+    if user.username in aclList:
         return True, 'By user name'
     # Админ
     return isAdmin(user)
 
-
 # Проверить право на чтение
-def aclCanRead(model, acl, user: User):
-    return aclCheckRights(model, acl, user, 'read')
+def aclCanRead(model, user: User):
+    return aclCheckRights(model, user, 'read')
 
+# Проверить право на изменение Владельцем
+def aclCanOwnerMod(model, user):
+    return aclCheckRights(model, user, 'o_mod')
 
-# Проверить право на создание
-def aclCanCrt(model, acl, user: User):
-    return aclCheckRights(model, acl, user, 'crt')
+# Проверить право на изменение ЛЮБЫМ
+def aclCanAllMod(model, user):
+    return aclCheckRights(model, user, 'a_mod')
 
-
-# Проверить право на изменение
-def aclCanMod(model, acl, user: User):
-    return aclCheckRights(model, acl, user, 'mod')
-
+# Проверить право на изменение - общий вид
+def aclCanMod(model, user):
+    if model.owner == user:
+        return aclCanOwnerMod(model, user)
+    else:
+        return aclCanAllMod(model, user)
 
 # Проверить право на построение отчетов
-def aclCanReport(model, acl, user: User):
-    return aclCheckRights(model, acl, user, 'report')
+def aclCanReport(model, user):
+    return aclCheckRights(model, user, 'report')
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +113,7 @@ def aclCanReport(model, acl, user: User):
 class SecurityModelExt(models.Model):
     owner = models.ForeignKey(User, verbose_name='Владелец', null=True, blank=True, on_delete=models.SET_NULL)
     acl = models.CharField(verbose_name='Права доступа', max_length=1000,
-                           default='{"read": ["*"], "crt": ["&"], "mod": ["&"], "report": ["*"] }')
+                           default='{"read": ["*"], "o_mod": ["*"], "a_mod": ["&"], "report": ["*"] }')
     #  ^  '*' все, '&' владелец
 
     class Meta:
@@ -241,47 +230,4 @@ class HierarchyOrderModelExt(models.Model):
         else:
             path = ''
         return path
-
-    # Получить дерево групп - рекурсия
-    @classmethod
-    def __getGroupsTreeRc(cls, tree, curParent):
-        groups = cls.objects.filter(parent=curParent, isGrp=True).order_by('order')
-        for gr in groups:
-            children = []
-            cls.__getGroupsTreeRc(children, gr)
-            if len(children) > 0:
-                tree.append({'key': gr.pk, 'label': gr.name, 'children': children, 'icon': 'pi pi-fw pi-folder-open'})
-            else:
-                tree.append({'key': gr.pk, 'label': gr.name, 'icon': 'pi pi-fw pi-folder'})
-        return
-
-    # Получить дерево групп
-    @classmethod
-    def getGroupsTree(cls):
-        tree = []
-        cls.__getGroupsTreeRc(tree, None)
-        return tree
-
-    # Получить дерево групп и элементов - рекурсия
-    @classmethod
-    def __getGroupsElemsTreeRc(cls, tree, curParent):
-        items = cls.objects.filter(parent=curParent).order_by('-isGrp', 'order')
-        for item in items:
-            children = []
-            cls.__getGroupsElemsTreeRc(children, item)
-            if len(children) > 0:
-                tree.append({'key': item.pk, 'data': {'isGrp': item.isGrp}, 'label': item.name, 'children': children, 'icon': 'pi pi-fw pi-folder-open'})
-            else:
-                if item.isGrp:
-                    tree.append({'key': item.pk, 'data': {'isGrp': item.isGrp}, 'label': item.name, 'icon': 'pi pi-fw pi-folder'})
-                else:
-                    tree.append({'key': item.pk, 'data': {'isGrp': item.isGrp}, 'label': item.name, 'icon': 'pi pi-fw pi-file'})
-        return
-
-    # Получить дерево групп и элементов
-    @classmethod
-    def getGroupsElemsTree(cls):
-        tree = []
-        cls.__getGroupsElemsTreeRc(tree, None)
-        return tree
 
