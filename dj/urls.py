@@ -13,35 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.template.defaulttags import url
-from django.urls import path, include
-from django.views.decorators.csrf import csrf_exempt
-from graphene_django.views import GraphQLView
-
-from dbcore.views import uploadFinOperPhoto, uploadProjectInfo
-
-from django.conf import settings
-from reports import report001, report002
+from django.urls import path
 
 urlpatterns = [
-    # Интерфейс администратора
-    path('admin/', admin.site.urls),
-    # Отладочный интерфей graphql
-    path('gp/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
-    # Загрузить фото фин операции
-    path('uploads/uploadFinOperPhoto/', csrf_exempt(uploadFinOperPhoto)),
-    # Загрузить объекты текстового редактора CKE из заметок проекта Project.info
-    path('uploads/uploadProjectInfo/', csrf_exempt(uploadProjectInfo)),
-    # Утилита переименования старых медиа файлов в новый формат
-    # path('beutils/cm/', csrf_exempt(convertMedia)),
+    path("admin/", admin.site.urls),
 ]
-
-
-# Профилировщик silk
-urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
-
-# Для доступа к медиа файлам в режиме разработки
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
