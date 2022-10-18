@@ -39,6 +39,7 @@ class CreateCatObject(graphene.Mutation):
         newItem.isGrp = isGrp
         newItem.name = name
         newItem.save()
+        # TODO: link=makeLinkForModel(item)
         logUserAction(info.context.user, itemModel, f"new {'group' if isGrp else 'element'} '{newItem.pk}:{newItem.name}'")
         return CreateCatObject(ok=True, result=f'Create in {itemModel}, id={newItem.pk}')
 
@@ -87,6 +88,7 @@ class DeleteCatObjects(graphene.Mutation):
             else:
                 delRefGroup = itemModel.objects.get(isGrp=True, name='_DELREF')
                 item.changeParent(delRefGroup)
+                # TODO: link=makeLinkForModel(item)
                 logUserAction(info.context.user, itemModel, f"move _DELREF, '{id}:{item.name}'")
         return DeleteCatObjects(ok=True, result=f'Delete in {itemModel}, ids={ids}')
 
@@ -107,6 +109,7 @@ class RenameCatObject(graphene.Mutation):
         oldName = item.name
         item.name = name
         item.save()
+        # TODO: link=makeLinkForModel(item)
         logUserAction(info.context.user, itemModel, f"rename '{id}:{name}'", diff=f"name: {oldName} -> {name}")
         return CreateCatObject(ok=True, result=f"Rename in {itemModel}, id={id}")
 
@@ -126,8 +129,8 @@ class ChangeOrderCatObject(graphene.Mutation):
         item = itemModel.objects.get(pk=id)
         oldOrder = item.order
         item.changeOrder(order)
-        # TODO: makeLinkForModel
-        logUserAction(info.context.user, itemModel, f"change order '{item.pk}:{item.name}'", diff=f"order: {oldOrder} -> {order}", link=makeLinkForModel(item))
+        # TODO: link=makeLinkForModel(item)
+        logUserAction(info.context.user, itemModel, f"change order '{item.pk}:{item.name}'", diff=f"order: {oldOrder} -> {order}")
         return ChangeOrderCatObject(ok=True, result=f"Change order in {itemModel}, id={id}")
 
 
@@ -149,8 +152,8 @@ class ChangeParentCatObjects(graphene.Mutation):
             item = itemModel.objects.get(pk=itemId)
             oldPid = item.parent.pk if item.parent is not None else -1
             item.changeParent(newParent)
-            # TODO: makeLinkForModel
-            logUserAction(info.context.user, itemModel, f"change parent '{item.pk}:{item.name}'", diff=f"pid: {oldPid} -> {pid}", link=makeLinkForModel(item))
+            # TODO: link=makeLinkForModel(item)
+            logUserAction(info.context.user, itemModel, f"change parent '{item.pk}:{item.name}'", diff=f"pid: {oldPid} -> {pid}")
         return ChangeParentCatObjects(ok=True, result=f"Change parent in {itemModel}, ids={ids}")
 
 
@@ -173,6 +176,6 @@ class CopyCatObjects(graphene.Mutation):
             clonedItem = item.clone(parent)
             clonedItem.owner = info.context.user
             clonedItem.save()
-            # TODO: makeLinkForModel
-            logUserAction(info.context.user, itemModel, f"clone to '{clonedItem.pk}:{clonedItem.name}' from '{item.pk}:{item.name}'", link=makeLinkForModel(clonedItem))
+            # TODO: link=makeLinkForModel(item)
+            logUserAction(info.context.user, itemModel, f"clone to '{clonedItem.pk}:{clonedItem.name}' from '{item.pk}:{item.name}'")
         return CopyCatObjects(ok=True, result=f"Clone in {itemModel}, ids={ids}")
