@@ -56,11 +56,10 @@ class CostTypeType(DjangoObjectType, CustomCat):
     class Meta:
         model = CostType
 
-    out = graphene.Boolean
+    out = graphene.Boolean()
 
-    @classmethod
-    def resolve_out(cls: CostType, info):
-        return cls.isOutcome
+    def resolve_out(self: CostType, info):
+        return self.isOutcome
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -68,7 +67,7 @@ class CostTypeType(DjangoObjectType, CustomCat):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class ProjectsQuery(graphene.ObjectType):
+class CatalogsQuery(graphene.ObjectType):
     # Проекты
     project = graphene.Field(ProjectType, id=graphene.Int())
     projects = graphene.List(ProjectType)

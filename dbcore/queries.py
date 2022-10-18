@@ -1,5 +1,10 @@
-from dbcore.gp_catalogs import ProjectsQuery
+import graphene
 
 
-class Query(ProjectsQuery):
-    pass
+from dbcore.gp_catalogs import CatalogsQuery
+
+
+class Query(
+    CatalogsQuery,
+    graphene.ObjectType
+): pass
