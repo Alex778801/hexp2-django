@@ -12,8 +12,8 @@ class UserType(DjangoObjectType):
 class CustomCat:
     id = graphene.Int()
     pid = graphene.Int()
-    g = graphene.Boolean()
-    o = graphene.Int()
+    grp = graphene.Boolean()
+    ord = graphene.Int()
 
     def resolve_id(self, info):
         if self is not None:
@@ -27,10 +27,10 @@ class CustomCat:
         else:
             return -1
 
-    def resolve_g(self: Project, info):
+    def resolve_grp(self: Project, info):
         return self.isGrp
 
-    def resolve_o(self: Project, info):
+    def resolve_ord(self: Project, info):
         return self.order
 
 

@@ -1,7 +1,10 @@
+import json
+
 import graphene
 from graphql_jwt.decorators import login_required
 
-from .models import Project
+from ua.models import logUserAction
+from .models import Project, Agent, CostType
 from .types import ProjectType
 
 
@@ -19,3 +22,4 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_projects(self, info, **kwargs):
         return Project.objects.all()
+
