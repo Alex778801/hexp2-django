@@ -48,7 +48,7 @@ class ProjectType(DjangoObjectType, CustomCat):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class Query(graphene.ObjectType):
+class ProjectsQuery(graphene.ObjectType):
     project = graphene.Field(ProjectType, id=graphene.Int())
     projects = graphene.List(ProjectType)
 
@@ -64,6 +64,11 @@ class Query(graphene.ObjectType):
         return Project.objects.all()
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# - М У Т А Ц И И
+# ----------------------------------------------------------------------------------------------------------------------
+
+
 # Вспомогательная - получить модель данных по ее строковому представлению
 def getItemModel(model):
     pModel = model.lower()
@@ -77,11 +82,6 @@ def getItemModel(model):
     return itemModel
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# - М У Т А Ц И И
-# ----------------------------------------------------------------------------------------------------------------------
-
-
 # Создание объекта справочника
 class CreateCatObject(graphene.Mutation):
     class Arguments:
@@ -93,6 +93,7 @@ class CreateCatObject(graphene.Mutation):
     ok = graphene.Boolean()
     result = graphene.String()
 
+    @login_required
     def mutate(root, info, model, pid, isGrp, name):
         itemModel = getItemModel(model)
         newItem = itemModel()
@@ -116,6 +117,7 @@ class DeleteCatObjects(graphene.Mutation):
     ok = graphene.Boolean()
     result = graphene.String()
 
+    @login_required
     def mutate(root, info, model, ids):
         itemModel = getItemModel(model)
         itemsId = json.loads(ids)
@@ -167,6 +169,7 @@ class RenameCatObject(graphene.Mutation):
     ok = graphene.Boolean()
     result = graphene.String()
 
+    @login_required
     def mutate(root, info, model, id, name):
         itemModel = getItemModel(model)
         item = itemModel.objects.get(pk=id)
@@ -189,6 +192,7 @@ class ChangeOrderCatObject(graphene.Mutation):
     ok = graphene.Boolean()
     result = graphene.String()
 
+    @login_required
     def mutate(root, info, model, id, order):
         itemModel = getItemModel(model)
         item = itemModel.objects.get(pk=id)
@@ -210,6 +214,7 @@ class ChangeParentCatObjects(graphene.Mutation):
     ok = graphene.Boolean()
     result = graphene.String()
 
+    @login_required
     def mutate(root, info, model, ids, pid):
         itemModel = getItemModel(model)
         itemsId = json.loads(ids)
@@ -237,6 +242,7 @@ class CopyCatObjects(graphene.Mutation):
     ok = graphene.Boolean()
     result = graphene.String()
 
+    @login_required
     def mutate(root, info, model, ids, pid):
         itemModel = getItemModel(model)
         itemsId = json.loads(ids)
