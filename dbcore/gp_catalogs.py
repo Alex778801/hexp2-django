@@ -1,23 +1,85 @@
 import json
-
 import graphene
-from django.core import serializers
+from graphene_django import DjangoObjectType
+from graphql_jwt.decorators import login_required
+
 
 from dbcore.models import Project, Agent, CostType
-from dj.myutils import CustomJSONEncoder
 from ua.models import logUserAction
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# - Т И П Ы
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+class CustomCat:
+    id = graphene.Int()
+    pid = graphene.Int()
+    grp = graphene.Boolean()
+    ord = graphene.Int()
+
+    def resolve_id(self, info):
+        if self is not None:
+            return self.id
+        else:
+            return -1
+
+    def resolve_pid(self: Project, info):
+        if self.parent_id is not None:
+            return self.parent_id
+        else:
+            return -1
+
+    def resolve_grp(self: Project, info):
+        return self.isGrp
+
+    def resolve_ord(self: Project, info):
+        return self.order
+
+
+class ProjectType(DjangoObjectType, CustomCat):
+    class Meta:
+        model = Project
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# - З А П Р О С Ы
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+class Query(graphene.ObjectType):
+    project = graphene.Field(ProjectType, id=graphene.Int())
+    projects = graphene.List(ProjectType)
+
+    @login_required
+    def resolve_project(self, info, **kwargs):
+        id = kwargs.get('id')
+        if id is not None:
+            return Project.objects.get(pk=id)
+        return None
+
+    @login_required
+    def resolve_projects(self, info, **kwargs):
+        return Project.objects.all()
+
+
+# Вспомогательная - получить модель данных по ее строковому представлению
 def getItemModel(model):
     pModel = model.lower()
     itemModel = None
-    if pModel == 'project':
+    if pModel == 'projects':
         itemModel = Project
-    elif pModel == 'agent':
+    elif pModel == 'agents':
         itemModel = Agent
     elif pModel == 'costtypes':
         itemModel = CostType
     return itemModel
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# - М У Т А Ц И И
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 # Создание объекта справочника
@@ -39,7 +101,9 @@ class CreateCatObject(graphene.Mutation):
         newItem.isGrp = isGrp
         newItem.name = name
         newItem.save()
+        # TODO: link=makeLinkForModel(item)
         logUserAction(info.context.user, itemModel, f"new {'group' if isGrp else 'element'} '{newItem.pk}:{newItem.name}'")
+        # noinspection PyArgumentList
         return CreateCatObject(ok=True, result=f'Create in {itemModel}, id={newItem.pk}')
 
 
@@ -87,7 +151,9 @@ class DeleteCatObjects(graphene.Mutation):
             else:
                 delRefGroup = itemModel.objects.get(isGrp=True, name='_DELREF')
                 item.changeParent(delRefGroup)
+                # TODO: link=makeLinkForModel(item)
                 logUserAction(info.context.user, itemModel, f"move _DELREF, '{id}:{item.name}'")
+        # noinspection PyArgumentList
         return DeleteCatObjects(ok=True, result=f'Delete in {itemModel}, ids={ids}')
 
 
@@ -107,7 +173,9 @@ class RenameCatObject(graphene.Mutation):
         oldName = item.name
         item.name = name
         item.save()
+        # TODO: link=makeLinkForModel(item)
         logUserAction(info.context.user, itemModel, f"rename '{id}:{name}'", diff=f"name: {oldName} -> {name}")
+        # noinspection PyArgumentList
         return CreateCatObject(ok=True, result=f"Rename in {itemModel}, id={id}")
 
 
@@ -126,8 +194,9 @@ class ChangeOrderCatObject(graphene.Mutation):
         item = itemModel.objects.get(pk=id)
         oldOrder = item.order
         item.changeOrder(order)
-        # TODO: makeLinkForModel
-        logUserAction(info.context.user, itemModel, f"change order '{item.pk}:{item.name}'", diff=f"order: {oldOrder} -> {order}", link=makeLinkForModel(item))
+        # TODO: link=makeLinkForModel(item)
+        logUserAction(info.context.user, itemModel, f"change order '{item.pk}:{item.name}'", diff=f"order: {oldOrder} -> {order}")
+        # noinspection PyArgumentList
         return ChangeOrderCatObject(ok=True, result=f"Change order in {itemModel}, id={id}")
 
 
@@ -144,13 +213,17 @@ class ChangeParentCatObjects(graphene.Mutation):
     def mutate(root, info, model, ids, pid):
         itemModel = getItemModel(model)
         itemsId = json.loads(ids)
-        newParent = itemModel.objects.get(pk=pid)
+        if pid != -1:
+            newParent = itemModel.objects.get(pk=pid)
+        else:
+            newParent = None
         for itemId in itemsId:
             item = itemModel.objects.get(pk=itemId)
             oldPid = item.parent.pk if item.parent is not None else -1
             item.changeParent(newParent)
-            # TODO: makeLinkForModel
-            logUserAction(info.context.user, itemModel, f"change parent '{item.pk}:{item.name}'", diff=f"pid: {oldPid} -> {pid}", link=makeLinkForModel(item))
+            # TODO: link=makeLinkForModel(item)
+            logUserAction(info.context.user, itemModel, f"change parent '{item.pk}:{item.name}'", diff=f"pid: {oldPid} -> {pid}")
+        # noinspection PyArgumentList
         return ChangeParentCatObjects(ok=True, result=f"Change parent in {itemModel}, ids={ids}")
 
 
@@ -159,7 +232,10 @@ class CopyCatObjects(graphene.Mutation):
     class Arguments:
         model = graphene.String()
         ids = graphene.String()
-        parentid = graphene.Int()
+        pid = graphene.Int()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
 
     def mutate(root, info, model, ids, pid):
         itemModel = getItemModel(model)
@@ -173,6 +249,7 @@ class CopyCatObjects(graphene.Mutation):
             clonedItem = item.clone(parent)
             clonedItem.owner = info.context.user
             clonedItem.save()
-            # TODO: makeLinkForModel
-            logUserAction(info.context.user, itemModel, f"clone to '{clonedItem.pk}:{clonedItem.name}' from '{item.pk}:{item.name}'", link=makeLinkForModel(clonedItem))
+            # TODO: link=makeLinkForModel(item)
+            logUserAction(info.context.user, itemModel, f"clone to '{clonedItem.pk}:{clonedItem.name}' from '{item.pk}:{item.name}'")
+        # noinspection PyArgumentList
         return CopyCatObjects(ok=True, result=f"Clone in {itemModel}, ids={ids}")

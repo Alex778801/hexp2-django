@@ -1,11 +1,8 @@
-import json
-
 import graphene
 from graphql_jwt.decorators import login_required
 
-from ua.models import logUserAction
-from .models import Project, Agent, CostType
-from .types import ProjectType
+from dbcore.gp_catalogs import ProjectType
+from dbcore.models import Project
 
 
 class Query(graphene.ObjectType):

@@ -1,17 +1,24 @@
 import graphene
 import graphql_jwt
+from graphene_django import DjangoObjectType
 
-from dbcore.mut_catalogs import CreateCatObject, DeleteCatObjects, RenameCatObject, ChangeOrderCatObject, \
-    ChangeParentCatObjects
-from dbcore.types import UserType
+from dbcore import models
+from dbcore.gp_catalogs import CreateCatObject, DeleteCatObjects, RenameCatObject, ChangeOrderCatObject, \
+    ChangeParentCatObjects, CopyCatObjects
 
 
 # Авторизация
+class UserType(DjangoObjectType):
+    class Meta:
+        model = models.User
+
+
 class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
     user = graphene.Field(UserType)
 
     @classmethod
     def resolve(cls, root, info, **kwargs):
+        # noinspection PyArgumentList
         return cls(user=info.context.user)
 
 
