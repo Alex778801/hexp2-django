@@ -8,16 +8,16 @@ from dj.myutils import CustomJSONEncoder
 from ua.models import logUserAction
 
 
-def getObjectModel(model):
+def getItemModel(model):
     pModel = model.lower()
-    objectModel = None
+    itemModel = None
     if pModel == 'project':
-        objectModel = Project
+        itemModel = Project
     elif pModel == 'agent':
-        objectModel = Agent
+        itemModel = Agent
     elif pModel == 'costtypes':
-        objectModel = CostType
-    return objectModel
+        itemModel = CostType
+    return itemModel
 
 
 # Создание объекта справочника
@@ -32,16 +32,15 @@ class CreateCatObject(graphene.Mutation):
     result = graphene.String()
 
     def mutate(root, info, model, pid, isGrp, name):
-        objectModel = getObjectModel(model)
-        newObject = objectModel()
+        itemModel = getItemModel(model)
+        newItem = itemModel()
         if pid != -1:
-            newObject.parent = Project.objects.get(pk=pid)
-        newObject.isGrp = isGrp
-        newObject.name = name
-        newObject.save()
-        logUserAction(info.context.user, objectModel,
-                      f"new object {'group' if isGrp else 'element'} '{newObject.pk}:{newObject.name}'")
-        return CreateCatObject(ok=True, result=f'Created in {objectModel}, id={newObject.pk}')
+            newItem.parent = Project.objects.get(pk=pid)
+        newItem.isGrp = isGrp
+        newItem.name = name
+        newItem.save()
+        logUserAction(info.context.user, itemModel, f"new {'group' if isGrp else 'element'} '{newItem.pk}:{newItem.name}'")
+        return CreateCatObject(ok=True, result=f'Create in {itemModel}, id={newItem.pk}')
 
 
 # Удаление объектов справочника
@@ -54,39 +53,126 @@ class DeleteCatObjects(graphene.Mutation):
     result = graphene.String()
 
     def mutate(root, info, model, ids):
-        objectModel = getObjectModel(model)
+        itemModel = getItemModel(model)
         itemsId = json.loads(ids)
         for itemId in itemsId:
-            item = objectModel.objects.get(pk=itemId)
+            item = itemModel.objects.get(pk=itemId)
             itemName = item.name
             # Проверка наличия ссылок на удаляемый объект
             refTotal = 0
             # ------------------------------------------------------
             # Группы
             if item.isGrp:
-                refTotal = objectModel.objects.filter(parent=item).count()
+                refTotal = itemModel.objects.filter(parent=item).count()
             # ------------------------------------------------------
             # Элементы
             else:
                 # Агенты
-                if objectModel == Agent:
+                if itemModel == Agent:
                     refProjectsQnty = item.prefAgentGroup.all().count()
                     refFinOpersAgentFromQ = item.agentFrom.all().count()
                     refFinOpersAgentToQ = item.agentTo.all().count()
                     refTotal = refProjectsQnty + refFinOpersAgentFromQ + refFinOpersAgentToQ
                 #  Статьи расхода
-                elif objectModel == CostType:
+                elif itemModel == CostType:
                     refProjectsQnty = item.prefCostTypeGroup.all().count()
                     refFinOpersQnty = item.costType.all().count()
                     refTotal = refProjectsQnty + refFinOpersQnty
             # ------------------------------------------------------
             # нет зависимостей - удаляем
             if refTotal == 0:
+                logUserAction(info.context.user, itemModel, f"delete '{id}:{item.name}'")
                 item.delete()
-                logUserAction(info.context.user, objectModel, f"delete '{itemId}:{itemName}'")
             # есть зависимости - переносим в папку _DELREF
             else:
-                delRefGroup = objectModel.objects.get(isGrp=True, name='_DELREF')
+                delRefGroup = itemModel.objects.get(isGrp=True, name='_DELREF')
                 item.changeParent(delRefGroup)
-                logUserAction(info.context.user, objectModel, f"move to _DELREF folder '{itemId}:{itemName}'")
-        return DeleteCatObjects(ok=True, result=f'Deleted in {objectModel}, ids={ids}')
+                logUserAction(info.context.user, itemModel, f"move _DELREF, '{id}:{item.name}'")
+        return DeleteCatObjects(ok=True, result=f'Delete in {itemModel}, ids={ids}')
+
+
+# Переименование объекта справочника
+class RenameCatObject(graphene.Mutation):
+    class Arguments:
+        model = graphene.String()
+        id = graphene.Int()
+        name = graphene.String()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    def mutate(root, info, model, id, name):
+        itemModel = getItemModel(model)
+        item = itemModel.objects.get(pk=id)
+        oldName = item.name
+        item.name = name
+        item.save()
+        logUserAction(info.context.user, itemModel, f"rename '{id}:{name}'", diff=f"name: {oldName} -> {name}")
+        return CreateCatObject(ok=True, result=f"Rename in {itemModel}, id={id}")
+
+
+# Изменение порядка объекта справочника
+class ChangeOrderCatObject(graphene.Mutation):
+    class Arguments:
+        model = graphene.String()
+        id = graphene.Int()
+        order = graphene.Int()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    def mutate(root, info, model, id, order):
+        itemModel = getItemModel(model)
+        item = itemModel.objects.get(pk=id)
+        oldOrder = item.order
+        item.changeOrder(order)
+        # TODO: makeLinkForModel
+        logUserAction(info.context.user, itemModel, f"change order '{item.pk}:{item.name}'", diff=f"order: {oldOrder} -> {order}", link=makeLinkForModel(item))
+        return ChangeOrderCatObject(ok=True, result=f"Change order in {itemModel}, id={id}")
+
+
+# Изменить родителя объектов справочника
+class ChangeParentCatObjects(graphene.Mutation):
+    class Arguments:
+        model = graphene.String()
+        ids = graphene.String()
+        pid = graphene.Int()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    def mutate(root, info, model, ids, pid):
+        itemModel = getItemModel(model)
+        itemsId = json.loads(ids)
+        newParent = itemModel.objects.get(pk=pid)
+        for itemId in itemsId:
+            item = itemModel.objects.get(pk=itemId)
+            oldPid = item.parent.pk if item.parent is not None else -1
+            item.changeParent(newParent)
+            # TODO: makeLinkForModel
+            logUserAction(info.context.user, itemModel, f"change parent '{item.pk}:{item.name}'", diff=f"pid: {oldPid} -> {pid}", link=makeLinkForModel(item))
+        return ChangeParentCatObjects(ok=True, result=f"Change parent in {itemModel}, ids={ids}")
+
+
+# Копировать (клонировать) объекты справочника
+class CopyCatObjects(graphene.Mutation):
+    class Arguments:
+        model = graphene.String()
+        ids = graphene.String()
+        parentid = graphene.Int()
+
+    def mutate(root, info, model, ids, pid):
+        itemModel = getItemModel(model)
+        itemsId = json.loads(ids)
+        if pid != -1:
+            parent = itemModel.objects.get(pk=pid)
+        else:
+            parent = None
+        for itemId in itemsId:
+            item = itemModel.objects.get(pk=itemId)
+            clonedItem = item.clone(parent)
+            clonedItem.owner = info.context.user
+            clonedItem.save()
+            # TODO: makeLinkForModel
+            logUserAction(info.context.user, itemModel, f"clone to '{clonedItem.pk}:{clonedItem.name}' from '{item.pk}:{item.name}'", link=makeLinkForModel(clonedItem))
+        return CopyCatObjects(ok=True, result=f"Clone in {itemModel}, ids={ids}")
