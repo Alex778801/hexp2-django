@@ -41,7 +41,7 @@ class CreateCatObject(graphene.Mutation):
         itemModel = getItemModel(model)
         newItem = itemModel()
         if pid != -1:
-            newItem.parent = Project.objects.get(pk=pid)
+            newItem.parent = itemModel.objects.get(pk=pid)
         newItem.isGrp = isGrp
         newItem.name = name
         newItem.save()
