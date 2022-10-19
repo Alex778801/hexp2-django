@@ -54,7 +54,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     def resolve_prefCostTypeGroupTree(self: Project, info):
         tmp = CostType.getGroupsTree()
 
-        res = json.dumps(tmp, ensure_ascii=False, cls=CustomJSONEncoder).encode('utf8')
+        res = json.dumps(tmp)
         return res
 
 # Агенты
