@@ -231,3 +231,20 @@ class HierarchyOrderModelExt(models.Model):
             path = ''
         return path
 
+    @classmethod
+    def getGroupsTreeRc(cls, tree, curParent):
+        groups = cls.__class__.objects.filter(parent=curParent, isGrp=True).order_by('order')
+        for gr in groups:
+            tree.append(gr)
+            if gr.isGrp:
+                cls.getGroupsTreeRc(tree, gr)
+        return
+
+    # Получить дерево групп
+    @classmethod
+    def getGroupsTree(cls):
+        tree = []
+        cls.getGroupsTreeRc(tree, None)
+
+
+

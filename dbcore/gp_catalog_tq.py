@@ -6,11 +6,13 @@ from graphql_jwt.decorators import login_required
 
 from dbcore.models import Project, Agent, CostType
 from dbcore.models_base import HierarchyOrderModelExt
+from dj.myutils import CustomJSONEncoder
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # - Т И П Ы
 # ----------------------------------------------------------------------------------------------------------------------
+
 
 # Базовый класс каталога
 class CustomCat:
@@ -43,6 +45,17 @@ class ProjectType(DjangoObjectType, CustomCat):
     class Meta:
         model = Project
 
+    path = graphene.String()
+    prefCostTypeGroupTree = graphene.String()
+
+    def resolve_path(self: Project, info):
+        return self.getParentsList()
+
+    def resolve_prefCostTypeGroupTree(self: Project, info):
+        tmp = CostType.getGroupsTree()
+
+        res = json.dumps(tmp, ensure_ascii=False, cls=CustomJSONEncoder).encode('utf8')
+        return res
 
 # Агенты
 class AgentType(DjangoObjectType, CustomCat):
@@ -62,7 +75,7 @@ class CostTypeType(DjangoObjectType, CustomCat):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - З А П Р О С Ы
+# З А П Р О С Ы
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -76,7 +89,6 @@ class CatalogsQuery(graphene.ObjectType):
     # Статьи
     costtype = graphene.Field(CostTypeType, id=graphene.Int())
     costtypes = graphene.List(CostTypeType)
-
 
     # -------------
     # Проект
