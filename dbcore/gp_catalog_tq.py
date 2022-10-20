@@ -47,7 +47,7 @@ class ProjectType(DjangoObjectType, CustomCat):
 
     path = graphene.String()
     prefCostTypeGroupTree = graphene.String()
-    c = graphene.String()
+    prefAgentGroupTree = graphene.String()
 
     def resolve_path(self: Project, info):
         return self.getParentsList()
@@ -61,7 +61,6 @@ class ProjectType(DjangoObjectType, CustomCat):
         tmp = Agent.getGroupsTree()
         res = json.dumps(tmp, ensure_ascii=True)
         return res
-
 
 
 # Агенты

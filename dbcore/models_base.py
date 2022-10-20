@@ -242,9 +242,9 @@ class HierarchyOrderModelExt(models.Model):
             children = []
             cls.getGroupsTreeRc(children, gr, key)
             if len(children) > 0:
-                tree.append({'key': curKey + str(i), 'data': gr.pk, 'label': gr.name, 'children': children})
+                tree.append({'key': curKey + str(i), 'data': gr.pk, 'label': gr.name, 'children': children, 'icon': 'fa folder-open'})
             else:
-                tree.append({'key': curKey + str(i), 'data': gr.pk, 'label': gr.name})
+                tree.append({'key': curKey + str(i), 'data': gr.pk, 'label': gr.name, 'icon': ''})
             i = i + 1
         return
 
