@@ -2,9 +2,9 @@ import json
 import graphene
 from graphql_jwt.decorators import login_required
 
-
+from django.contrib.auth.models import User
 from dbcore.models import Project, Agent, CostType
-from ua.models import logUserAction
+from ua.models import logUserAction, modelDiff
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,14 +16,13 @@ from ua.models import logUserAction
 def getItemModel(model):
     pModel = model.lower()
     itemModel = None
-    if pModel == 'projects':
+    if pModel == 'project':
         itemModel = Project
-    elif pModel == 'agents':
+    elif pModel == 'agent':
         itemModel = Agent
-    elif pModel == 'costtypes':
+    elif pModel == 'costtype':
         itemModel = CostType
     return itemModel
-
 
 # Создание объекта справочника
 class CreateCatObject(graphene.Mutation):
@@ -44,9 +43,10 @@ class CreateCatObject(graphene.Mutation):
             newItem.parent = itemModel.objects.get(pk=pid)
         newItem.isGrp = isGrp
         newItem.name = name
+        newItem.owner = info.context.user
         newItem.save()
-        # TODO: link=makeLinkForModel(item)
-        logUserAction(info.context.user, itemModel, f"new {'group' if isGrp else 'element'} '{newItem.pk}:{newItem.name}'")
+        logUserAction(info.context.user, itemModel, f"new {'group' if isGrp else 'element'} '{newItem.pk}:{newItem.name}'",
+                      link=f"/{model}/{newItem.pk}")
         # noinspection PyArgumentList
         return CreateCatObject(ok=True, result=f'Create in {itemModel}, id={newItem.pk}')
 
@@ -96,7 +96,6 @@ class DeleteCatObjects(graphene.Mutation):
             else:
                 delRefGroup = itemModel.objects.get(isGrp=True, name='_DELREF')
                 item.changeParent(delRefGroup)
-                # TODO: link=makeLinkForModel(item)
                 logUserAction(info.context.user, itemModel, f"move _DELREF, '{id}:{item.name}'")
         # noinspection PyArgumentList
         return DeleteCatObjects(ok=True, result=f'Delete in {itemModel}, ids={ids}')
@@ -119,8 +118,8 @@ class RenameCatObject(graphene.Mutation):
         oldName = item.name
         item.name = name
         item.save()
-        # TODO: link=makeLinkForModel(item)
-        logUserAction(info.context.user, itemModel, f"rename '{id}:{name}'", diff=f"name: {oldName} -> {name}")
+        logUserAction(info.context.user, itemModel, f"rename '{id}:{name}'", diff=f"name: {oldName} -> {name}",
+                      link=f"/{model}/{item.pk}")
         # noinspection PyArgumentList
         return CreateCatObject(ok=True, result=f"Rename in {itemModel}, id={id}")
 
@@ -141,8 +140,8 @@ class ChangeOrderCatObject(graphene.Mutation):
         item = itemModel.objects.get(pk=id)
         oldOrder = item.order
         item.changeOrder(order)
-        # TODO: link=makeLinkForModel(item)
-        logUserAction(info.context.user, itemModel, f"change order '{item.pk}:{item.name}'", diff=f"order: {oldOrder} -> {order}")
+        logUserAction(info.context.user, itemModel, f"change order '{item.pk}:{item.name}'", diff=f"order: {oldOrder} -> {order}",
+                      link=f"/{model}/{item.pk}")
         # noinspection PyArgumentList
         return ChangeOrderCatObject(ok=True, result=f"Change order in {itemModel}, id={id}")
 
@@ -169,8 +168,8 @@ class ChangeParentCatObjects(graphene.Mutation):
             item = itemModel.objects.get(pk=itemId)
             oldPid = item.parent.pk if item.parent is not None else -1
             item.changeParent(newParent)
-            # TODO: link=makeLinkForModel(item)
-            logUserAction(info.context.user, itemModel, f"change parent '{item.pk}:{item.name}'", diff=f"pid: {oldPid} -> {pid}")
+            logUserAction(info.context.user, itemModel, f"change parent '{item.pk}:{item.name}'", diff=f"pid: {oldPid} -> {pid}",
+                          link=f"/{model}/{item.pk}")
         # noinspection PyArgumentList
         return ChangeParentCatObjects(ok=True, result=f"Change parent in {itemModel}, ids={ids}")
 
@@ -198,7 +197,44 @@ class CopyCatObjects(graphene.Mutation):
             clonedItem = item.clone(parent)
             clonedItem.owner = info.context.user
             clonedItem.save()
-            # TODO: link=makeLinkForModel(item)
-            logUserAction(info.context.user, itemModel, f"clone to '{clonedItem.pk}:{clonedItem.name}' from '{item.pk}:{item.name}'")
+            logUserAction(info.context.user, itemModel, f"clone to '{clonedItem.pk}:{clonedItem.name}' from '{item.pk}:{item.name}'",
+                          link=f"/{model}/{clonedItem.pk}")
         # noinspection PyArgumentList
         return CopyCatObjects(ok=True, result=f"Clone in {itemModel}, ids={ids}")
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Обновление элемента справочника
+class UpdateProject(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        name = graphene.String()
+        prefCostTypeGroup = graphene.Int()
+        prefAgentGroup = graphene.Int()
+        prefFinOperLogIntv = graphene.Int()
+        prefFinOperLogIntvN = graphene.Int()
+        owner = graphene.String()
+        acl = graphene.String()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    @login_required
+    def mutate(root, info, id, name, prefCostTypeGroup, prefAgentGroup,
+               prefFinOperLogIntv, prefFinOperLogIntvN, owner, acl):
+        project = Project.objects.get(pk=id)
+        # --
+        project.name = name
+        project.prefCostTypeGroup = CostType.objects.get(pk=prefCostTypeGroup)
+        project.prefAgentGroup = Agent.objects.get(pk=prefAgentGroup)
+        project.prefFinOperLogIntv = prefFinOperLogIntv
+        project.prefFinOperLogIntv_n = prefFinOperLogIntvN
+        project.acl = acl
+        project.owner = User.objects.get(username=owner)
+        # --
+        diff = modelDiff(Project.objects.get(pk=project.pk), project)
+        project.save()
+        logUserAction(info.context.user, Project, f"save '{project.pk}:{project.name}'", link=f"/project/{project.pk}", diff=diff)
+        # noinspection PyArgumentList
+        return CopyCatObjects(ok=True, result=f"Update in {Project}, id={project.pk}")
+
+
