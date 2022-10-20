@@ -1,4 +1,5 @@
 import json
+
 import graphene
 from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
@@ -48,6 +49,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     path = graphene.String()
     prefCostTypeGroupTree = graphene.String()
     prefAgentGroupTree = graphene.String()
+    logIntervalList = graphene.String()
 
     def resolve_path(self: Project, info):
         return self.getParentsList()
@@ -61,6 +63,12 @@ class ProjectType(DjangoObjectType, CustomCat):
         tmp = Agent.getGroupsTree()
         res = json.dumps(tmp, ensure_ascii=True)
         return res
+
+    def resolve_logIntervalList(self: Project, info):
+        tmp = list(map(lambda i: {'id': i['id'].value, 'label': i['fn']}, Project.Ext.logIntv))
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
 
 
 # Агенты
