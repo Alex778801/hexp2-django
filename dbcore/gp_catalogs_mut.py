@@ -225,7 +225,7 @@ class UpdateProject(graphene.Mutation):
 
         project = Project.objects.get(pk=id)
         # Изменять может только админ или владелец!
-        if isAdmin(info.context.user) or info.context.user == project.owner:
+        if not isAdmin(info.context.user) and not info.context.user == project.owner:
             raise Exception("У вас нет прав на изменение данного объекта!")
         # --
         project.name = name
