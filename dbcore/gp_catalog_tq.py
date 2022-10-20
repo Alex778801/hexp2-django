@@ -1,11 +1,12 @@
 import json
+
 import graphene
 from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 
 
 from dbcore.models import Project, Agent, CostType
-from dbcore.models_base import HierarchyOrderModelExt
+from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList
 from dj.myutils import CustomJSONEncoder
 
 
@@ -47,14 +48,43 @@ class ProjectType(DjangoObjectType, CustomCat):
 
     path = graphene.String()
     prefCostTypeGroupTree = graphene.String()
+    prefAgentGroupTree = graphene.String()
+    logIntervalList = graphene.String()
+    owner = graphene.String()
+    aclList = graphene.String()
 
+    # Путь к проекту
     def resolve_path(self: Project, info):
         return self.getParentsList()
 
+    # Дерево групп Статей
     def resolve_prefCostTypeGroupTree(self: Project, info):
         tmp = CostType.getGroupsTree()
         res = json.dumps(tmp, ensure_ascii=True)
         return res
+
+    # Дерево групп Агентов
+    def resolve_prefAgentGroupTree(self: Project, info):
+        tmp = Agent.getGroupsTree()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Интервалы журнала
+    def resolve_logIntervalList(self: Project, info):
+        tmp = list(map(lambda i: {'id': i['id'].value, 'label': i['fn']}, Project.Ext.logIntv))
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Владелец
+    def resolve_owner(self: Project, info):
+        return self.owner.username
+
+    # Список пользователей и служебных записей авторизации
+    def resolve_aclList(self: Project, info):
+        tmp = aclGetUsersList()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
 
 # Агенты
 class AgentType(DjangoObjectType, CustomCat):
