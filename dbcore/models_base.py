@@ -13,6 +13,13 @@ import re
 # ----------------------------------------------------------------------------------------------------------------------
 # Вспомогательные функции для обработки прав доступа
 
+def aclGetUsersList():
+    list = [{'id': '*', 'label': 'Любой (*)'}, {'id': '&', 'label': 'Владелец (&)'}]
+    userList = User.objects.all()
+    for u in userList:
+        list.append({'id': u.username, 'label': u.username})
+    return list
+
 # Получить список пользователей из строки
 def aclParseStr(_str):
     return re.split(";|,", _str.replace(' ', ''))
