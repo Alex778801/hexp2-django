@@ -4,6 +4,7 @@ from graphql_jwt.decorators import login_required
 
 from django.contrib.auth.models import User
 from dbcore.models import Project, Agent, CostType
+from dbcore.models_base import isAdmin
 from ua.models import logUserAction, modelDiff
 
 
@@ -221,7 +222,11 @@ class UpdateProject(graphene.Mutation):
     @login_required
     def mutate(root, info, id, name, prefCostTypeGroup, prefAgentGroup,
                prefFinOperLogIntv, prefFinOperLogIntvN, owner, acl):
+
         project = Project.objects.get(pk=id)
+        # Изменять может только админ или владелец!
+        if isAdmin(info.context.user) or info.context.user == project.owner:
+            raise Exception("У вас нет прав на изменение данного объекта!")
         # --
         project.name = name
         project.prefCostTypeGroup = CostType.objects.get(pk=prefCostTypeGroup)
