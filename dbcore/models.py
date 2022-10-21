@@ -45,7 +45,7 @@ class Project(HierarchyOrderModelExt, SecurityModelExt):
 class CostType(HierarchyOrderModelExt, SecurityModelExt):
     name = models.CharField(verbose_name='Название', max_length=100, default='Новая статья')
     isOutcome = models.BooleanField(verbose_name='Расходная', default=True)
-    color = models.CharField(verbose_name='Цвет', max_length=20, default='#AAAAAAFF')
+    color = models.CharField(verbose_name='Цвет', max_length=20, default='#AAAAAA')
 
     class Ext:
         useHierarchy = True
