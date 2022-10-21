@@ -92,13 +92,6 @@ class ProjectType(DjangoObjectType, CustomCat):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Агенты
-class AgentType(DjangoObjectType, CustomCat):
-    class Meta:
-        model = Agent
-
-
-# ----------------------------------------------------------------------------------------------------------------------
 # Статьи
 class CostTypeType(DjangoObjectType, CustomCat):
     class Meta:
@@ -123,13 +116,43 @@ class CostTypeType(DjangoObjectType, CustomCat):
         return self.owner.username if self.owner is not None else None
 
     # Список пользователей и служебных записей авторизации
-    def resolve_aclList(self: Project, info):
+    def resolve_aclList(self: CostType, info):
         tmp = aclGetUsersList()
         res = json.dumps(tmp, ensure_ascii=True)
         return res
 
     # Разрешено только чтение
     def resolve_readOnly(self: CostType, info):
+        return not isAdmin(info.context.user)[0] and not self.owner == info.context.user and self.owner is not None
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Агенты
+class AgentType(DjangoObjectType, CustomCat):
+    class Meta:
+        model = Agent
+
+    path = graphene.String()
+    owner = graphene.String()
+    aclList = graphene.String()
+    readOnly = graphene.Boolean()
+
+    # Путь к проекту
+    def resolve_path(self: Agent, info):
+        return self.getParentsList()
+
+    # Владелец
+    def resolve_owner(self: Agent, info):
+        return self.owner.username if self.owner is not None else None
+
+    # Список пользователей и служебных записей авторизации
+    def resolve_aclList(self: Agent, info):
+        tmp = aclGetUsersList()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Разрешено только чтение
+    def resolve_readOnly(self: Agent, info):
         return not isAdmin(info.context.user)[0] and not self.owner == info.context.user and self.owner is not None
 
 
