@@ -203,10 +203,11 @@ class CopyCatObjects(graphene.Mutation):
         # noinspection PyArgumentList
         return CopyCatObjects(ok=True, result=f"Clone in {itemModel}, ids={ids}")
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Обновление элемента справочника
 
-# ПРОЕКТЫ
+# Обновить - ПРОЕКТЫ
 class UpdateProject(graphene.Mutation):
     class Arguments:
         id = graphene.Int()
@@ -224,7 +225,6 @@ class UpdateProject(graphene.Mutation):
     @login_required
     def mutate(root, info, id, name, prefCostTypeGroup, prefAgentGroup,
                prefFinOperLogIntv, prefFinOperLogIntvN, owner, acl):
-
         project = Project.objects.get(pk=id)
         # Изменять может только админ или владелец!
         if not isAdmin(info.context.user) and not info.context.user == project.owner and project.owner is not None:
@@ -236,7 +236,7 @@ class UpdateProject(graphene.Mutation):
         project.prefFinOperLogIntv = prefFinOperLogIntv
         project.prefFinOperLogIntv_n = prefFinOperLogIntvN
         project.acl = acl
-        project.owner = User.objects.get(username=owner)
+        project.owner = User.objects.filter(username=owner).first()
         # --
         diff = modelDiff(Project.objects.get(pk=project.pk), project)
         project.save()
@@ -245,7 +245,7 @@ class UpdateProject(graphene.Mutation):
         return CopyCatObjects(ok=True, result=f"Update in {Project}, id={project.pk}")
 
 
-# СТАТЬИ
+# Обновить - СТАТЬЯ
 class UpdateCostType(graphene.Mutation):
     class Arguments:
         id = graphene.Int()
@@ -259,7 +259,6 @@ class UpdateCostType(graphene.Mutation):
 
     @login_required
     def mutate(root, info, id, name, color, isOutcome, owner):
-
         costType = CostType.objects.get(pk=id)
         # Изменять может только админ или владелец!
         if not isAdmin(info.context.user) and not info.context.user == costType.owner and costType.owner is not None:
@@ -268,10 +267,37 @@ class UpdateCostType(graphene.Mutation):
         costType.name = name
         costType.color = color
         costType.isOutcome = isOutcome
-        costType.owner = User.objects.get(username=owner)
+        costType.owner = User.objects.filter(username=owner).first()
         # --
         diff = modelDiff(CostType.objects.get(pk=costType.pk), costType)
         costType.save()
         logUserAction(info.context.user, CostType, f"save '{costType.pk}:{costType.name}'", link=f"/costtype/{costType.pk}", diff=diff)
         # noinspection PyArgumentList
         return CopyCatObjects(ok=True, result=f"Update in {CostType}, id={costType.pk}")
+
+
+# Обновить - АГЕНТ
+class UpdateAgent(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        name = graphene.String()
+        owner = graphene.String()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    @login_required
+    def mutate(root, info, id, name, owner):
+        agent = Agent.objects.get(pk=id)
+        # Изменять может только админ или владелец!
+        if not isAdmin(info.context.user) and not info.context.user == agent.owner and agent.owner is not None:
+            raise Exception("У вас нет прав на изменение данного объекта!")
+        # --
+        agent.name = name
+        agent.owner = User.objects.filter(username=owner).first()
+        # --
+        diff = modelDiff(Agent.objects.get(pk=agent.pk), agent)
+        agent.save()
+        logUserAction(info.context.user, Agent, f"save '{agent.pk}:{agent.name}'", link=f"/agent/{agent.pk}", diff=diff)
+        # noinspection PyArgumentList
+        return CopyCatObjects(ok=True, result=f"Update in {Agent}, id={agent.pk}")
