@@ -47,16 +47,14 @@ def aclUsersExist(aclStr):
 
 
 # Запаковать списки доступа в словарь
-def aclPack(readStr, omodStr, amodStr, reportStr):
+def aclPack(readStr, modStr, reportStr):
     read = aclParseStr(readStr)
     aclCheckUsers(read)
-    omod = aclParseStr(omodStr)
-    aclCheckUsers(omod)
-    amod = aclParseStr(amodStr)
-    aclCheckUsers(amod)
+    mod = aclParseStr(modStr)
+    aclCheckUsers(mod)
     report = aclParseStr(reportStr)
     aclCheckUsers(report)
-    return {'read': read, 'o_mod': omod,  'a_mod': amod, 'report': report}
+    return {'read': read, 'mod': mod, 'report': report}
 
 # Распаковать список доступа из словаря по ключу-домену
 def aclUnpack(domain):
@@ -78,7 +76,7 @@ def isAdmin(user):
 def aclCheckRights(model, user: User, domain):
     # Список доступа по домену
     acl = json.loads(model.acl)
-    aclList =  aclParseStr(aclUnpack(acl[domain]))
+    aclList = aclParseStr(aclUnpack(acl[domain]))
     # ВСЕ *
     if '*' in aclList:
         return True, 'By * (all)'
@@ -96,19 +94,8 @@ def aclCanRead(model, user: User):
     return aclCheckRights(model, user, 'read')
 
 # Проверить право на изменение Владельцем
-def aclCanOwnerMod(model, user):
-    return aclCheckRights(model, user, 'o_mod')
-
-# Проверить право на изменение ЛЮБЫМ
-def aclCanAllMod(model, user):
-    return aclCheckRights(model, user, 'a_mod')
-
-# Проверить право на изменение - общий вид
 def aclCanMod(model, user):
-    if model.owner == user:
-        return aclCanOwnerMod(model, user)
-    else:
-        return aclCanAllMod(model, user)
+    return aclCheckRights(model, user, 'mod')
 
 # Проверить право на построение отчетов
 def aclCanReport(model, user):
@@ -120,7 +107,7 @@ def aclCanReport(model, user):
 class SecurityModelExt(models.Model):
     owner = models.ForeignKey(User, verbose_name='Владелец', null=True, blank=True, on_delete=models.SET_NULL)
     acl = models.CharField(verbose_name='Права доступа', max_length=1000,
-                           default='{"read": ["*"], "o_mod": ["*"], "a_mod": ["&"], "report": ["*"] }')
+                           default='{"read": ["*"], "mod": ["&"], "report": ["*"] }')
     #  ^  '*' все, '&' владелец
 
     class Meta:
