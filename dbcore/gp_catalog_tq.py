@@ -6,7 +6,7 @@ from graphql_jwt.decorators import login_required
 
 
 from dbcore.models import Project, Agent, CostType
-from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList
+from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin
 from dj.myutils import CustomJSONEncoder
 
 
@@ -52,6 +52,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     logIntervalList = graphene.String()
     owner = graphene.String()
     aclList = graphene.String()
+    canMod = graphene.Boolean()
 
     # Путь к проекту
     def resolve_path(self: Project, info):
@@ -84,6 +85,10 @@ class ProjectType(DjangoObjectType, CustomCat):
         tmp = aclGetUsersList()
         res = json.dumps(tmp, ensure_ascii=True)
         return res
+
+    # Изменять
+    def resolve_canMod(self: Project, info):
+        return isAdmin(info.context.user)[0] or self.owner == info.context.user
 
 
 # Агенты

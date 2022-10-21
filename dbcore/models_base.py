@@ -70,7 +70,7 @@ def isAdmin(user):
     adminsGrpList = ('Admin', 'admin', 'Administrators', 'administrators')
     if user.groups.filter(name__in=adminsGrpList).exists():
         return True, 'By admins group'
-    return False
+    return False, ''
 
 # Проверить ПРАВО
 def aclCheckRights(model, user: User, domain):
@@ -94,11 +94,11 @@ def aclCanRead(model, user: User):
     return aclCheckRights(model, user, 'read')
 
 # Проверить право на изменение Владельцем
-def aclCanMod(model, user):
+def aclCanMod(model, user: User):
     return aclCheckRights(model, user, 'mod')
 
 # Проверить право на построение отчетов
-def aclCanReport(model, user):
+def aclCanReport(model, user: User):
     return aclCheckRights(model, user, 'report')
 
 
