@@ -229,8 +229,8 @@ class UpdateProject(graphene.Mutation):
             raise Exception("У вас нет прав на изменение данного объекта!")
         # --
         project.name = name
-        project.prefCostTypeGroup = CostType.objects.get(pk=prefCostTypeGroup)
-        project.prefAgentGroup = Agent.objects.get(pk=prefAgentGroup)
+        project.prefCostTypeGroup = None if prefCostTypeGroup == -1 else CostType.objects.get(pk=prefCostTypeGroup)
+        project.prefAgentGroup = None if prefAgentGroup == -1 else Agent.objects.get(pk=prefAgentGroup)
         project.prefFinOperLogIntv = prefFinOperLogIntv
         project.prefFinOperLogIntv_n = prefFinOperLogIntvN
         project.acl = acl
