@@ -56,8 +56,10 @@ class UserActionAdmin(admin.ModelAdmin):
     dt.short_description = 'Дата'
 
     def http(self, obj):
+        from django.conf import settings
+        baseAddress = settings.UA_BASEADDR
         if obj.link is not None:
-            return format_html('<a href="{url}">{url}</a>', url=obj.link)
+            return format_html('<a href="{baseAddress}{url}">{baseAddress}{url}</a>', url=obj.link)
         else:
             return ''
 

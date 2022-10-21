@@ -205,6 +205,8 @@ class CopyCatObjects(graphene.Mutation):
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Обновление элемента справочника
+
+# ПРОЕКТЫ
 class UpdateProject(graphene.Mutation):
     class Arguments:
         id = graphene.Int()
@@ -225,7 +227,7 @@ class UpdateProject(graphene.Mutation):
 
         project = Project.objects.get(pk=id)
         # Изменять может только админ или владелец!
-        if not isAdmin(info.context.user) and not info.context.user == project.owner:
+        if not isAdmin(info.context.user) and not info.context.user == project.owner and project.owner is not None:
             raise Exception("У вас нет прав на изменение данного объекта!")
         # --
         project.name = name
@@ -243,3 +245,33 @@ class UpdateProject(graphene.Mutation):
         return CopyCatObjects(ok=True, result=f"Update in {Project}, id={project.pk}")
 
 
+# СТАТЬИ
+class UpdateCostType(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        name = graphene.String()
+        color = graphene.String()
+        isOutcome = graphene.Boolean()
+        owner = graphene.String()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    @login_required
+    def mutate(root, info, id, name, color, isOutcome, owner):
+
+        costType = CostType.objects.get(pk=id)
+        # Изменять может только админ или владелец!
+        if not isAdmin(info.context.user) and not info.context.user == costType.owner and costType.owner is not None:
+            raise Exception("У вас нет прав на изменение данного объекта!")
+        # --
+        costType.name = name
+        costType.color = color
+        costType.isOutcome = isOutcome
+        costType.owner = User.objects.get(username=owner)
+        # --
+        diff = modelDiff(CostType.objects.get(pk=costType.pk), costType)
+        costType.save()
+        logUserAction(info.context.user, CostType, f"save '{costType.pk}:{costType.name}'", link=f"/costtype/{costType.pk}", diff=diff)
+        # noinspection PyArgumentList
+        return CopyCatObjects(ok=True, result=f"Update in {CostType}, id={costType.pk}")
