@@ -58,16 +58,12 @@ class UserAction(models.Model):
 
 # Запись действия пользователя
 def logUserAction(user, obj, msg, wl=0, link=None, diff=None):
-    from django.conf import settings
-    # baseAddress = 'http://localhost:8080'
-    baseAddress = settings.UA_BASEADDR
     ua = UserAction()
     ua.user = user
     ua.object = obj
     ua.msg = msg
     ua.warnLvl = wl
-    # ua.link = link
-    ua.link = f'{baseAddress}{link}'
+    ua.link = link
     ua.diff = diff
     ua.save()
     print(f'{user}|{wl}|{obj}|{msg}|{link}|{diff}')

@@ -5,7 +5,7 @@ from graphene_django import DjangoObjectType
 from dbcore import models
 from dbcore.gp_catalog_tq import CatalogsQuery
 from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatObject, ChangeOrderCatObject, \
-    ChangeParentCatObjects, CopyCatObjects, UpdateProject
+    ChangeParentCatObjects, CopyCatObjects, UpdateProject, UpdateCostType
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +60,8 @@ class Mutation(graphene.ObjectType):
     copy_cat_objects = CopyCatObjects.Field()
     # Обновить проект
     update_project = UpdateProject.Field()
+    # Обновить статью
+    update_costtype = UpdateCostType.Field()
     # -----------------------------------------------------
 
 
