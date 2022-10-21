@@ -58,7 +58,9 @@ class UserAction(models.Model):
 
 # Запись действия пользователя
 def logUserAction(user, obj, msg, wl=0, link=None, diff=None):
-    baseAddress = 'http://localhost:8080'
+    from django.conf import settings
+    # baseAddress = 'http://localhost:8080'
+    baseAddress = settings.UA_BASEADDR
     ua = UserAction()
     ua.user = user
     ua.object = obj
