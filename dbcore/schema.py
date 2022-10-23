@@ -3,9 +3,10 @@ import graphql_jwt
 from graphene_django import DjangoObjectType
 
 from dbcore import models
-from dbcore.gp_catalog_tq import CatalogsQuery
+from dbcore.gp_catalogs_tq import CatalogsQuery
 from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatObject, ChangeOrderCatObject, \
     ChangeParentCatObjects, CopyCatObjects, UpdateProject, UpdateCostType, UpdateAgent
+from dbcore.gp_finopers import FinOpersQuery
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -14,6 +15,7 @@ from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatO
 
 class Query(
     CatalogsQuery,
+    FinOpersQuery,
     graphene.ObjectType
 ): pass
 
@@ -65,6 +67,8 @@ class Mutation(graphene.ObjectType):
     # Обновить агента
     update_agent = UpdateAgent.Field()
     # -----------------------------------------------------
+    # ФИНАНСОВЫЕ ОПЕРАЦИИ
+    # Создать/обновить
 
 
 # ----------------------------------------------------------------------------------------------------------------------

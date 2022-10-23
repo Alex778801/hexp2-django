@@ -4,16 +4,21 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 
-from dbcore.models import Project, Agent, CostType
+from dbcore.models import Project, Agent, CostType, FinOper
 from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin
-from dj.myutils import CustomJSONEncoder
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# - Т И П Ы
+# К А Т А Л О Г И
 # ----------------------------------------------------------------------------------------------------------------------
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# ТИПЫ
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Базовый класс каталога
 class CustomCat:
     id = graphene.Int()
@@ -41,7 +46,7 @@ class CustomCat:
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Проекты
+# Проект
 class ProjectType(DjangoObjectType, CustomCat):
     class Meta:
         model = Project
@@ -92,7 +97,7 @@ class ProjectType(DjangoObjectType, CustomCat):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Статьи
+# Статья
 class CostTypeType(DjangoObjectType, CustomCat):
     class Meta:
         model = CostType
@@ -127,7 +132,7 @@ class CostTypeType(DjangoObjectType, CustomCat):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Агенты
+# Агент
 class AgentType(DjangoObjectType, CustomCat):
     class Meta:
         model = Agent
@@ -157,7 +162,7 @@ class AgentType(DjangoObjectType, CustomCat):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# З А П Р О С Ы
+# ЗАПРОСЫ
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -172,7 +177,6 @@ class CatalogsQuery(graphene.ObjectType):
     costtype = graphene.Field(CostTypeType, id=graphene.Int())
     costtypes = graphene.List(CostTypeType)
 
-    # -------------
     # Проект
     @login_required
     def resolve_project(self, info, **kwargs):
@@ -186,7 +190,6 @@ class CatalogsQuery(graphene.ObjectType):
     def resolve_projects(self, info, **kwargs):
         return Project.objects.all()
 
-    # -------------
     # Агент
     @login_required
     def resolve_agent(self, info, **kwargs):
@@ -200,7 +203,6 @@ class CatalogsQuery(graphene.ObjectType):
     def resolve_agents(self, info, **kwargs):
         return Agent.objects.all()
 
-    # -------------
     # Статья
     @login_required
     def resolve_costtype(self, info, **kwargs):
@@ -209,7 +211,10 @@ class CatalogsQuery(graphene.ObjectType):
             return CostType.objects.get(pk=id)
         return None
 
-    # Статьи
+    # СтатьИ
     @login_required
     def resolve_costtypes(self, info, **kwargs):
         return CostType.objects.all()
+
+
+

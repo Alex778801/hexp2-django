@@ -9,7 +9,7 @@ from ua.models import logUserAction, modelDiff
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# М У Т А Ц И И
+# К А Т А Л О Г И
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -24,6 +24,7 @@ def getItemModel(model):
     elif pModel == 'costtype':
         itemModel = CostType
     return itemModel
+
 
 # Создание объекта справочника
 class CreateCatObject(graphene.Mutation):
