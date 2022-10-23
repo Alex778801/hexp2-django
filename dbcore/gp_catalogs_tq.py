@@ -54,6 +54,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     path = graphene.String()
     prefCostTypeGroupTree = graphene.String()
     prefAgentGroupTree = graphene.String()
+    tree = graphene.String()
     logIntervalList = graphene.String()
     owner = graphene.String()
     aclList = graphene.String()
@@ -74,6 +75,7 @@ class ProjectType(DjangoObjectType, CustomCat):
         tmp = Agent.getGroupsTree()
         res = json.dumps(tmp, ensure_ascii=True)
         return res
+
 
     # Интервалы журнала
     def resolve_logIntervalList(self: Project, info):
@@ -174,8 +176,10 @@ class CatalogsQuery(graphene.ObjectType):
     agent = graphene.Field(AgentType, id=graphene.Int())
     agents = graphene.List(AgentType)
     # Статьи
-    costtype = graphene.Field(CostTypeType, id=graphene.Int())
-    costtypes = graphene.List(CostTypeType)
+    costType = graphene.Field(CostTypeType, id=graphene.Int())
+    costTypes = graphene.List(CostTypeType)
+    # Дерево проектов
+    projectsTree = graphene.String()
 
     # Проект
     @login_required
@@ -205,7 +209,7 @@ class CatalogsQuery(graphene.ObjectType):
 
     # Статья
     @login_required
-    def resolve_costtype(self, info, **kwargs):
+    def resolve_costType(self, info, **kwargs):
         id = kwargs.get('id')
         if id is not None:
             return CostType.objects.get(pk=id)
@@ -213,8 +217,11 @@ class CatalogsQuery(graphene.ObjectType):
 
     # СтатьИ
     @login_required
-    def resolve_costtypes(self, info, **kwargs):
+    def resolve_costTypes(self, info, **kwargs):
         return CostType.objects.all()
 
-
-
+    # Дерево групп и элементов Проектов
+    def resolve_projectsTree(self, info):
+        tmp = Project.getGroupsElemsTree()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res

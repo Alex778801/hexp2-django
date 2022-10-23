@@ -274,7 +274,7 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
-              "name": "costtype",
+              "name": "costType",
               "type": {
                 "kind": "OBJECT",
                 "name": "CostTypeType",
@@ -286,7 +286,7 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
-              "name": "costtypes",
+              "name": "costTypes",
               "type": {
                 "kind": "LIST",
                 "name": null,
@@ -295,6 +295,18 @@
                   "name": "CostTypeType",
                   "ofType": null
                 }
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "projectsTree",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               }
             }
           ],
@@ -1120,6 +1132,18 @@
               "description": null,
               "isDeprecated": false,
               "name": "prefAgentGroupTree",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "tree",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
