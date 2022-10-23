@@ -42,7 +42,7 @@ class LogIntv(Enum):
 
 # Получить временной интервал
 def parseTsIntv(tsBegin, tsEnd, intv, intv_n):
-    if tsBegin == '*':
+    if tsBegin == -1:
         now = datetime.now()
         if intv == LogIntv.INF.value:
             tsBegin = datetime(1970, 1, 1)
