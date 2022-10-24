@@ -30,7 +30,10 @@ class CustomCat:
         return self.id
 
     def resolve_pid(self: HierarchyOrderModelExt, info):
-        return self.parent_id
+        if self.parent_id is not None:
+            return self.parent_id
+        else:
+            return -1
 
     def resolve_grp(self: HierarchyOrderModelExt, info):
         return self.isGrp
