@@ -58,7 +58,7 @@ def aclPack(readStr, modStr, reportStr):
 
 # Распаковать список доступа из словаря по ключу-домену
 def aclUnpack(domain):
-    return reduce(lambda a, b: '' + a + '; ' + b, domain)
+    return reduce(lambda a, b: '' + a + '; ' + b, domain, '')
 
 # Проверить административные привилегии пользователя
 def isAdmin(user):

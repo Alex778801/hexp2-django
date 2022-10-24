@@ -5,7 +5,7 @@ from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 
 from dbcore.models import Project, Agent, CostType, FinOper
-from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin
+from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin, aclCanRead
 
 import json
 import os
@@ -68,14 +68,19 @@ class FinOpersQuery(graphene.ObjectType):
     # Финансовая операция
     @login_required
     def resolve_finoper(self, info, id):
-        if id is not None:
-            return FinOper.objects.get(pk=id)
-        else:
-            return None
+        oper = FinOper.objects.get(pk=id)
+        canRead = aclCanRead(oper.project, info.context.user)
+        if not canRead:
+            raise Exception("У вас нет прав на просмотр данного объекта!")
+        return oper
+
 
     # Журнал фин операций проекта
     @login_required
     def resolve_finopers(self, info, projectId, tsBegin, tsEnd):
         project = Project.objects.get(pk=projectId)
+        canRead = aclCanRead(project, info.context.user)
+        if not canRead:
+            raise Exception("У вас нет прав на просмотр данного объекта!")
         tsBegin, tsEnd = parseTsIntv(tsBegin, tsEnd, project.prefFinOperLogIntv, project.prefFinOperLogIntv_n)
         return FinOper.objects.filter(project=project, moment__gte=tsBegin, moment__lte=tsEnd)
