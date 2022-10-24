@@ -66,7 +66,7 @@ class FinOpersQuery(graphene.ObjectType):
     finopers = graphene.List(FinOperType, projectId=graphene.Int(), tsBegin=graphene.Int(), tsEnd=graphene.Int())
 
     # Финансовая операция
-    # @login_required
+    @login_required
     def resolve_finoper(self, info, id):
         if id is not None:
             return FinOper.objects.get(pk=id)
@@ -74,7 +74,7 @@ class FinOpersQuery(graphene.ObjectType):
             return None
 
     # Журнал фин операций проекта
-    # @login_required
+    @login_required
     def resolve_finopers(self, info, projectId, tsBegin, tsEnd):
         project = Project.objects.get(pk=projectId)
         tsBegin, tsEnd = parseTsIntv(tsBegin, tsEnd, project.prefFinOperLogIntv, project.prefFinOperLogIntv_n)

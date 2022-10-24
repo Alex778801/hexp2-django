@@ -123,7 +123,7 @@ class RenameCatObject(graphene.Mutation):
         logUserAction(info.context.user, itemModel, f"rename '{id}:{name}'", diff=f"name: {oldName} -> {name}",
                       link=f"/{model}/{item.pk}")
         # noinspection PyArgumentList
-        return CreateCatObject(ok=True, result=f"Rename in {itemModel}, id={id}")
+        return RenameCatObject(ok=True, result=f"Rename in {itemModel}, id={id}")
 
 
 # Изменение порядка объекта справочника
@@ -243,7 +243,7 @@ class UpdateProject(graphene.Mutation):
         project.save()
         logUserAction(info.context.user, Project, f"save '{project.pk}:{project.name}'", link=f"/project/{project.pk}", diff=diff)
         # noinspection PyArgumentList
-        return CopyCatObjects(ok=True, result=f"Update in {Project}, id={project.pk}")
+        return UpdateProject(ok=True, result=f"Update in {Project}, id={project.pk}")
 
 
 # Обновить - СТАТЬЯ
@@ -274,7 +274,7 @@ class UpdateCostType(graphene.Mutation):
         costType.save()
         logUserAction(info.context.user, CostType, f"save '{costType.pk}:{costType.name}'", link=f"/costtype/{costType.pk}", diff=diff)
         # noinspection PyArgumentList
-        return CopyCatObjects(ok=True, result=f"Update in {CostType}, id={costType.pk}")
+        return UpdateCostType(ok=True, result=f"Update in {CostType}, id={costType.pk}")
 
 
 # Обновить - АГЕНТ
@@ -301,4 +301,4 @@ class UpdateAgent(graphene.Mutation):
         agent.save()
         logUserAction(info.context.user, Agent, f"save '{agent.pk}:{agent.name}'", link=f"/agent/{agent.pk}", diff=diff)
         # noinspection PyArgumentList
-        return CopyCatObjects(ok=True, result=f"Update in {Agent}, id={agent.pk}")
+        return UpdateAgent(ok=True, result=f"Update in {Agent}, id={agent.pk}")
