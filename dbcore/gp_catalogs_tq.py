@@ -27,16 +27,10 @@ class CustomCat:
     ord = graphene.Int()
 
     def resolve_id(self, info):
-        if self is not None:
-            return self.id
-        else:
-            return -1
+        return self.id
 
     def resolve_pid(self: HierarchyOrderModelExt, info):
-        if self.parent_id is not None:
-            return self.parent_id
-        else:
-            return -1
+        return self.parent_id
 
     def resolve_grp(self: HierarchyOrderModelExt, info):
         return self.isGrp
@@ -183,41 +177,32 @@ class CatalogsQuery(graphene.ObjectType):
 
     # Проект
     @login_required
-    def resolve_project(self, info, **kwargs):
-        id = kwargs.get('id')
-        if id is not None:
-            return Project.objects.get(pk=id)
-        return None
+    def resolve_project(self, info, id):
+        return Project.objects.get(pk=id)
 
     # ПроектЫ
     @login_required
-    def resolve_projects(self, info, **kwargs):
+    def resolve_projects(self, info):
         return Project.objects.all()
 
     # Агент
     @login_required
-    def resolve_agent(self, info, **kwargs):
-        id = kwargs.get('id')
-        if id is not None:
-            return Agent.objects.get(pk=id)
-        return None
+    def resolve_agent(self, info, id):
+        return Agent.objects.get(pk=id)
 
     # АгентЫ
     @login_required
-    def resolve_agents(self, info, **kwargs):
+    def resolve_agents(self, info):
         return Agent.objects.all()
 
     # Статья
     @login_required
-    def resolve_costType(self, info, **kwargs):
-        id = kwargs.get('id')
-        if id is not None:
-            return CostType.objects.get(pk=id)
-        return None
+    def resolve_costType(self, info, id):
+        return CostType.objects.get(pk=id)
 
     # СтатьИ
     @login_required
-    def resolve_costTypes(self, info, **kwargs):
+    def resolve_costTypes(self, info):
         return CostType.objects.all()
 
     # Дерево групп и элементов Проектов

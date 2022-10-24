@@ -6,7 +6,7 @@ from dbcore import models
 from dbcore.gp_catalogs_tq import CatalogsQuery
 from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatObject, ChangeOrderCatObject, \
     ChangeParentCatObjects, CopyCatObjects, UpdateProject, UpdateCostType, UpdateAgent
-from dbcore.gp_finopers import FinOpersQuery
+from dbcore.gp_finopers_tq import FinOpersQuery
 from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper
 
 
