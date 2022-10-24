@@ -69,7 +69,7 @@ class FinOpersQuery(graphene.ObjectType):
     @login_required
     def resolve_finoper(self, info, id):
         oper = FinOper.objects.get(pk=id)
-        canRead = aclCanRead(oper.project, info.context.user)
+        canRead = aclCanRead(oper.project, info.context.user)[0]
         if not canRead:
             raise Exception("У вас нет прав на просмотр данного объекта!")
         return oper
@@ -79,7 +79,7 @@ class FinOpersQuery(graphene.ObjectType):
     @login_required
     def resolve_finopers(self, info, projectId, tsBegin, tsEnd):
         project = Project.objects.get(pk=projectId)
-        canRead = aclCanRead(project, info.context.user)
+        canRead = aclCanRead(project, info.context.user)[0]
         if not canRead:
             raise Exception("У вас нет прав на просмотр данного объекта!")
         tsBegin, tsEnd = parseTsIntv(tsBegin, tsEnd, project.prefFinOperLogIntv, project.prefFinOperLogIntv_n)
