@@ -73,17 +73,17 @@ def isAdmin(user):
     return False, ''
 
 # Проверить ПРАВО
-def aclCheckRights(model, user: User, domain):
+def aclCheckRights(model, acl, user: User, domain):
     # Список доступа по домену
-    acl = json.loads(model.acl)
-    accessList = acl[domain]
+    aclUnpack = json.loads(acl)
+    accessList = aclUnpack[domain]
     if accessList is None:
         accessList = []
     # ВСЕ *
     if '*' in accessList:
         return True, 'By * (all)'
     # ВЛАДЕЛЕЦ (создатель)
-    if '&' in accessList and User == model.owner:
+    if '&' in accessList and user == model.owner:
         return True, 'By & (owner)'
     # Конкретный пользователь
     if user.username in accessList:
@@ -92,16 +92,16 @@ def aclCheckRights(model, user: User, domain):
     return isAdmin(user)
 
 # Проверить право на чтение
-def aclCanRead(model, user: User):
-    return aclCheckRights(model, user, 'read')
+def aclCanRead(model, acl, user: User):
+    return aclCheckRights(model, acl, user, 'read')
 
 # Проверить право на изменение Владельцем
-def aclCanMod(model, user: User):
-    return aclCheckRights(model, user, 'mod')
+def aclCanMod(model, acl, user: User):
+    return aclCheckRights(model, acl, user, 'mod')
 
 # Проверить право на построение отчетов
-def aclCanReport(model, user: User):
-    return aclCheckRights(model, user, 'report')
+def aclCanReport(model, acl, user: User):
+    return aclCheckRights(model, acl, user, 'report')
 
 
 # ----------------------------------------------------------------------------------------------------------------------
