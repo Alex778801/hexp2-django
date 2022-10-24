@@ -225,30 +225,46 @@ class HierarchyOrderModelExt(models.Model):
             path = ''
         return path
 
-    # Получить дерево групп - реркурсия
+    # Получить дерево групп - рекурсия
     @classmethod
-    def getGroupsTreeRc(cls, tree, curParent, key):
+    def __getGroupsTreeRc(cls, tree, curParent):
         groups = cls.objects.filter(parent=curParent, isGrp=True).order_by('order')
-        i = 0
-        curKey = key
-        key = key + str(i) + '-'
         for gr in groups:
             children = []
-            cls.getGroupsTreeRc(children, gr, key)
+            cls.__getGroupsTreeRc(children, gr)
             if len(children) > 0:
-                tree.append({'key': curKey + str(i), 'data': gr.pk, 'label': gr.name, 'children': children})
+                tree.append({'key': gr.pk, 'label': gr.name, 'children': children, 'icon': 'pi pi-fw pi-folder-open'})
             else:
-                tree.append({'key': curKey + str(i), 'data': gr.pk, 'label': gr.name})
-            i = i + 1
+                tree.append({'key': gr.pk, 'label': gr.name, 'icon': 'pi pi-fw pi-folder'})
         return
 
     # Получить дерево групп
     @classmethod
     def getGroupsTree(cls):
         tree = []
-        key = ''
-        cls.getGroupsTreeRc(tree, None, key)
+        cls.__getGroupsTreeRc(tree, None)
         return tree
 
+    # Получить дерево групп и элементов - рекурсия
+    @classmethod
+    def __getGroupsElemsTreeRc(cls, tree, curParent):
+        items = cls.objects.filter(parent=curParent).order_by('order')
+        for item in items:
+            children = []
+            cls.__getGroupsElemsTreeRc(children, item)
+            if len(children) > 0:
+                tree.append({'key': item.pk, 'label': item.name, 'children': children, 'icon': 'pi pi-fw pi-folder-open'})
+            else:
+                if item.isGrp:
+                    tree.append({'key': item.pk, 'label': item.name, 'icon': 'pi pi-fw pi-folder'})
+                else:
+                    tree.append({'key': item.pk, 'label': item.name, 'icon': 'pi pi-fw pi-file'})
+        return
 
+    # Получить дерево групп и элементов
+    @classmethod
+    def getGroupsElemsTree(cls):
+        tree = []
+        cls.__getGroupsElemsTreeRc(tree, None)
+        return tree
 
