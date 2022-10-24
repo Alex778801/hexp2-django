@@ -27,10 +27,7 @@ class CustomCat:
     ord = graphene.Int()
 
     def resolve_id(self, info):
-        if self is not None:
-            return self.id
-        else:
-            return -1
+        return self.id
 
     def resolve_pid(self: HierarchyOrderModelExt, info):
         if self.parent_id is not None:
@@ -54,6 +51,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     path = graphene.String()
     prefCostTypeGroupTree = graphene.String()
     prefAgentGroupTree = graphene.String()
+    tree = graphene.String()
     logIntervalList = graphene.String()
     owner = graphene.String()
     aclList = graphene.String()
@@ -74,6 +72,7 @@ class ProjectType(DjangoObjectType, CustomCat):
         tmp = Agent.getGroupsTree()
         res = json.dumps(tmp, ensure_ascii=True)
         return res
+
 
     # Интервалы журнала
     def resolve_logIntervalList(self: Project, info):
@@ -174,47 +173,43 @@ class CatalogsQuery(graphene.ObjectType):
     agent = graphene.Field(AgentType, id=graphene.Int())
     agents = graphene.List(AgentType)
     # Статьи
-    costtype = graphene.Field(CostTypeType, id=graphene.Int())
-    costtypes = graphene.List(CostTypeType)
+    costType = graphene.Field(CostTypeType, id=graphene.Int())
+    costTypes = graphene.List(CostTypeType)
+    # Дерево проектов
+    projectsTree = graphene.String()
 
     # Проект
     @login_required
-    def resolve_project(self, info, **kwargs):
-        id = kwargs.get('id')
-        if id is not None:
-            return Project.objects.get(pk=id)
-        return None
+    def resolve_project(self, info, id):
+        return Project.objects.get(pk=id)
 
     # ПроектЫ
     @login_required
-    def resolve_projects(self, info, **kwargs):
+    def resolve_projects(self, info):
         return Project.objects.all()
 
     # Агент
     @login_required
-    def resolve_agent(self, info, **kwargs):
-        id = kwargs.get('id')
-        if id is not None:
-            return Agent.objects.get(pk=id)
-        return None
+    def resolve_agent(self, info, id):
+        return Agent.objects.get(pk=id)
 
     # АгентЫ
     @login_required
-    def resolve_agents(self, info, **kwargs):
+    def resolve_agents(self, info):
         return Agent.objects.all()
 
     # Статья
     @login_required
-    def resolve_costtype(self, info, **kwargs):
-        id = kwargs.get('id')
-        if id is not None:
-            return CostType.objects.get(pk=id)
-        return None
+    def resolve_costType(self, info, id):
+        return CostType.objects.get(pk=id)
 
     # СтатьИ
     @login_required
-    def resolve_costtypes(self, info, **kwargs):
+    def resolve_costTypes(self, info):
         return CostType.objects.all()
 
-
-
+    # Дерево групп и элементов Проектов
+    def resolve_projectsTree(self, info):
+        tmp = Project.getGroupsElemsTree()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
