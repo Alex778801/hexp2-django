@@ -248,17 +248,17 @@ class HierarchyOrderModelExt(models.Model):
     # Получить дерево групп и элементов - рекурсия
     @classmethod
     def __getGroupsElemsTreeRc(cls, tree, curParent):
-        items = cls.objects.filter(parent=curParent).order_by('order')
+        items = cls.objects.filter(parent=curParent).order_by('-isGrp', 'order')
         for item in items:
             children = []
             cls.__getGroupsElemsTreeRc(children, item)
             if len(children) > 0:
-                tree.append({'key': item.pk, 'label': item.name, 'children': children, 'icon': 'pi pi-fw pi-folder-open'})
+                tree.append({'key': item.pk, 'data': {'isGrp': item.isGrp}, 'label': item.name, 'children': children, 'icon': 'pi pi-fw pi-folder-open'})
             else:
                 if item.isGrp:
-                    tree.append({'key': item.pk, 'label': item.name, 'icon': 'pi pi-fw pi-folder'})
+                    tree.append({'key': item.pk, 'data': {'isGrp': item.isGrp}, 'label': item.name, 'icon': 'pi pi-fw pi-folder'})
                 else:
-                    tree.append({'key': item.pk, 'label': item.name, 'icon': 'pi pi-fw pi-file'})
+                    tree.append({'key': item.pk, 'data': {'isGrp': item.isGrp}, 'label': item.name, 'icon': 'pi pi-fw pi-file'})
         return
 
     # Получить дерево групп и элементов
