@@ -46,19 +46,19 @@ def aclUsersExist(aclStr):
     return True, None
 
 
-# Запаковать списки доступа в словарь
-def aclPack(readStr, modStr, reportStr):
-    read = aclParseStr(readStr)
-    aclCheckUsers(read)
-    mod = aclParseStr(modStr)
-    aclCheckUsers(mod)
-    report = aclParseStr(reportStr)
-    aclCheckUsers(report)
-    return {'read': read, 'mod': mod, 'report': report}
-
-# Распаковать список доступа из словаря по ключу-домену
-def aclUnpack(domain):
-    return reduce(lambda a, b: '' + a + '; ' + b, domain, '')
+# # Запаковать списки доступа в словарь
+# def aclPack(readStr, modStr, reportStr):
+#     read = aclParseStr(readStr)
+#     aclCheckUsers(read)
+#     mod = aclParseStr(modStr)
+#     aclCheckUsers(mod)
+#     report = aclParseStr(reportStr)
+#     aclCheckUsers(report)
+#     return {'read': read, 'mod': mod, 'report': report}
+#
+# # Распаковать список доступа из словаря по ключу-домену
+# def aclUnpack(domain):
+#     return reduce(lambda a, b: '' + a + '; ' + b, domain, '')
 
 # Проверить административные привилегии пользователя
 def isAdmin(user):
@@ -76,15 +76,17 @@ def isAdmin(user):
 def aclCheckRights(model, user: User, domain):
     # Список доступа по домену
     acl = json.loads(model.acl)
-    aclList = aclParseStr(aclUnpack(acl[domain]))
+    accessList = acl[domain]
+    if accessList is None:
+        accessList = []
     # ВСЕ *
-    if '*' in aclList:
+    if '*' in accessList:
         return True, 'By * (all)'
     # ВЛАДЕЛЕЦ (создатель)
-    if '&' in aclList and User == model.owner:
+    if '&' in accessList and User == model.owner:
         return True, 'By & (owner)'
     # Конкретный пользователь
-    if user.username in aclList:
+    if user.username in accessList:
         return True, 'By user name'
     # Админ
     return isAdmin(user)
