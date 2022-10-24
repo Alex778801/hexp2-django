@@ -4,7 +4,7 @@ from graphql_jwt.decorators import login_required
 
 from django.contrib.auth.models import User
 from dbcore.models import Project, Agent, CostType, FinOper
-from dbcore.models_base import isAdmin, aclCanRead, aclCanMod
+from dbcore.models_base import isAdmin, aclCanRead, aclCanMod, aclCanCrt
 from ua.models import logUserAction, modelDiff
 
 
@@ -29,9 +29,8 @@ class MoveFinOper(graphene.Mutation):
         newProject = Project.objects.get(pk=projectId)
         # -- Безопасность ACL
         canModSource = aclCanMod(oper, oper.project.acl, info.context.user)[0]
-        # todo: crt!
-        canModTarget = aclCanMod(oper, newProject.acl, info.context.user)[0]
-        if not canModSource or not canModTarget:
+        canCrtTarget = aclCanCrt(newProject, newProject.acl, info.context.user)[0]
+        if not canModSource or not canCrtTarget:
             raise Exception("У вас нет прав на перемещение данного объекта!")
         # --
         oper.project = newProject
@@ -55,7 +54,8 @@ class CopyFinOper(graphene.Mutation):
         oper = FinOper.objects.get(pk=id)
         # -- Безопасность ACL
         canMod = aclCanMod(oper, oper.project.acl, info.context.user)[0]
-        if not canMod:
+        canCrt = aclCanCrt(oper.project, oper.project.acl, info.context.user)[0]
+        if not canMod or not canCrt:
             raise Exception("У вас нет прав на копирование данного объекта!")
         # --
         copyOper = oper
