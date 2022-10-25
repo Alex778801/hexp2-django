@@ -35,8 +35,9 @@ class MoveFinOper(graphene.Mutation):
         # --
         oper.project = newProject
         oper.save();
-        logUserAction(info.context.user, FinOper, f"change project id={id}", diff=f"projectId: {oldProjectId} -> {projectId}",
-                          link=f"/finoper/{id}")
+        logUserAction(info.context.user, FinOper, f"change project id={id}",
+                      diff=f"projectId: {oldProjectId} -> {projectId}",
+                      link=f"/finoper/{id}")
         # noinspection PyArgumentList
         return MoveFinOper(ok=True, result=f"Change project {FinOper}, id={id}")
 
@@ -91,7 +92,68 @@ class DeleteFinOper(graphene.Mutation):
         operPk = oper.pk
         operAmount = oper.amount
         oper.delete()
-        logUserAction(info.context.user, FinOper, f"delete '{operProjectPk}:{operProjectName}' ~ '{operPk} = {operAmount}'")
+        logUserAction(info.context.user, FinOper,
+                      f"delete '{operProjectPk}:{operProjectName}' ~ '{operPk} = {operAmount}'")
         # noinspection PyArgumentList
         return DeleteFinOper(ok=True, result=f"Delete {FinOper}, id={id}")
 
+
+# Создать/обновить фин операцию
+class UpdateFinOper(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        projectId = graphene.Int()
+        ts = graphene.Int()
+        costTypeId = graphene.Int()
+        agentFromId = graphene.Int()
+        agentToId = graphene.Int()
+        amount = graphene.String()
+        notes = graphene.String()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    @login_required
+    def mutate(root, info, id, projectId, ts, costTypeId, agentFromId, agentToId, amount, notes):
+        if id == -1:
+            # Создаем новую фин операцию
+            project = Project.objects.get(pk=projectId)
+            # -- Безопасность ACL
+            canCrt = aclCanCrt(project, project.acl, info.context.user)[0]
+            if not canCrt:
+                raise Exception("У вас нет прав на создание данного объекта!")
+            # --
+            oper = FinOper()
+            oper.project = project
+            oper.owner = info.context.user
+            oper.costType = CostType.objects.filter(parent=project.prefCostTypeGroup).first()
+        else:
+            # Обновляем существующую фин операцию
+            oper = FinOper.objects.get(pk=id)
+            # -- Безопасность ACL
+            canMod = aclCanMod(oper, oper.project.acl, info.context.user)[0]
+            if not canMod:
+                raise Exception("У вас нет прав на модификацию данного объекта!")
+        # ---------
+
+
+
+
+
+        # Журнал
+        if id == -1:
+            logUserAction(info.context.user, FinOper, f"create id={oper.pk}",
+                          link=f"/finoper/{oper.pk}")
+        else:
+            diff = modelDiff(FinOper.objects.get(pk=oper.pk), oper)
+            oper.save()
+            logUserAction(info.context.user, FinOper, f"update id={oper.pk}",
+                          diff=diff,
+                          link=f"/finoper/{oper.pk}")
+        # Возврат
+        if id == -1:
+            # noinspection PyArgumentList
+            return UpdateFinOper(ok=True, result=f"Create {FinOper}, id={oper.pk}")
+        else:
+            # noinspection PyArgumentList
+            return UpdateFinOper(ok=True, result=f"Update {FinOper}, id={oper.pk}")
