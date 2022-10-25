@@ -174,7 +174,7 @@ class CatalogsQuery(graphene.ObjectType):
     agents = graphene.List(AgentType)
     # Статьи
     costType = graphene.Field(CostTypeType, id=graphene.Int())
-    costTypes = graphene.List(CostTypeType)
+    costTypes = graphene.List(CostTypeType, pid=graphene.Int())
     # Дерево проектов
     projectsTree = graphene.String()
 
@@ -205,8 +205,11 @@ class CatalogsQuery(graphene.ObjectType):
 
     # СтатьИ
     @login_required
-    def resolve_costTypes(self, info):
-        return CostType.objects.all()
+    def resolve_costTypes(self, info, pid=-1):
+        if pid == -1:
+            return CostType.objects.all()
+        else:
+            return CostType.objects.filter(parent_id=pid)
 
     # Дерево групп и элементов Проектов
     def resolve_projectsTree(self, info):
