@@ -124,7 +124,7 @@ def aclCanReport(model, acl, user: User):
 class SecurityModelExt(models.Model):
     owner = models.ForeignKey(User, verbose_name='Владелец', null=True, blank=True, on_delete=models.SET_NULL)
     acl = models.CharField(verbose_name='Права доступа', max_length=1000,
-                           default='{"read": ["*"], "crt": ["*"], "mod": ["&"], "report": ["*"] }')
+                           default='{"read": ["*"], "crt": ["&"], "mod": ["&"], "report": ["*"] }')
     #  ^  '*' все, '&' владелец
 
     class Meta:

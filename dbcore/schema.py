@@ -7,7 +7,7 @@ from dbcore.gp_catalogs_tq import CatalogsQuery
 from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatObject, ChangeOrderCatObject, \
     ChangeParentCatObjects, CopyCatObjects, UpdateProject, UpdateCostType, UpdateAgent
 from dbcore.gp_finopers_tq import FinOpersQuery
-from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper
+from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper, UpdateFinOper
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ class Mutation(graphene.ObjectType):
     # -----------------------------------------------------
     # ФИНАНСОВЫЕ ОПЕРАЦИИ
     # Создать/обновить фин операцию
-
+    update_finoper = UpdateFinOper.Field()
     # Переместить фин операцию в другой проект
     move_finoper = MoveFinOper.Field()
     # Копировать (клонировать) фин операцию
