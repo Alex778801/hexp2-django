@@ -4,8 +4,9 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 
+from dbcore.gp_catalogs_tq import CostTypeType, AgentType, ProjectType
 from dbcore.models import Project, Agent, CostType, FinOper
-from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin, aclCanRead
+from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin, aclCanRead, aclCanMod
 
 import json
 import os
@@ -35,17 +36,27 @@ class FinOperType(DjangoObjectType):
         model = FinOper
 
     ts = graphene.Int()
+    tsjs = graphene.DateTime()
     user = graphene.String()
     ucol = graphene.String()
     pq = graphene.Int()
+    project = graphene.Field(ProjectType)
+    ctList = graphene.List(CostTypeType)
+    agList = graphene.List(AgentType)
+    aclList = graphene.String()
+    readOnly = graphene.Boolean()
 
     # Метка времени операции в формате unix
     def resolve_ts(self: FinOper, info):
         return self.moment.timestamp()
 
+    # Метка времени операции в формате js
+    def resolve_tsjs(self: FinOper, info):
+        return self.moment
+
     # Владелец операции
-    def resolve_user(self: FinOper, info):
-        return self.owner.username
+    def resolve_user(self: Agent, info):
+        return self.owner.username if self.owner is not None else None
 
     # Цвет владельца операции
     def resolve_ucol(self: FinOper, info):
@@ -54,6 +65,28 @@ class FinOperType(DjangoObjectType):
     # Колво фото у операции
     def resolve_pq(self: FinOper, info):
         return self.photo_set.all().count()
+
+    # Проект (к которому принадлежит операция)
+    def resolve_project(self: FinOper, info):
+        return self.project
+
+    # Список статей для выбора
+    def resolve_ctList(self: FinOper, info):
+        return CostType.objects.filter(parent=self.project.prefCostTypeGroup)
+
+    # Список агентов для выбора
+    def resolve_agList(self: FinOper, info):
+        return Agent.objects.filter(parent=self.project.prefAgentGroup)
+
+    # Список пользователей и служебных записей авторизации
+    def resolve_aclList(self: FinOper, info):
+        tmp = aclGetUsersList()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Разрешено только чтение
+    def resolve_readOnly(self: FinOper, info):
+        return not aclCanMod(self, self.project.acl, info.context.user)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
