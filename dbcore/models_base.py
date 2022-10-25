@@ -10,42 +10,36 @@ from functools import reduce
 from django.utils.translation import gettext as _
 import re
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Вспомогательные функции для обработки прав доступа
 
-def aclGetUsersList():
-    list = [{'id': '*', 'label': 'Любой (*)'}, {'id': '&', 'label': 'Владелец (&)'}]
-    userList = User.objects.all()
-    for u in userList:
-        list.append({'id': u.username, 'label': u.username})
-    return list
-
-# Получить список пользователей из строки
-def aclParseStr(_str):
-    return re.split(";|,", _str.replace(' ', ''))
-
-# Проверить корректность (существование) имен пользователей в списке доступа
-def aclCheckUsers(users):
-    for user in users:
-        if user != '*' and user != '&':
-            try:
-                User.objects.get(username=user)
-            except:
-                raise Exception(f'СКД {users} содержит несуществующего пользователя "{user}"')
-
-
-# Проверить существование пользователей в списоке контроля доступа
-def aclUsersExist(aclStr):
-    users = aclParseStr(aclStr)
-    for user in users:
-        if user != '*' and user != '&':
-            try:
-                User.objects.get(username=user)
-            except:
-                return False, user
-    return True, None
-
-
+# # Получить список пользователей из строки
+# def aclParseStr(_str):
+#     return re.split(";|,", _str.replace(' ', ''))
+#
+# # Проверить корректность (существование) имен пользователей в списке доступа
+# def aclCheckUsers(users):
+#     for user in users:
+#         if user != '*' and user != '&':
+#             try:
+#                 User.objects.get(username=user)
+#             except:
+#                 raise Exception(f'СКД {users} содержит несуществующего пользователя "{user}"')
+#
+#
+# # Проверить существование пользователей в списоке контроля доступа
+# def aclUsersExist(aclStr):
+#     users = aclParseStr(aclStr)
+#     for user in users:
+#         if user != '*' and user != '&':
+#             try:
+#                 User.objects.get(username=user)
+#             except:
+#                 return False, user
+#     return True, None
+#
+#
 # # Запаковать списки доступа в словарь
 # def aclPack(readStr, modStr, reportStr):
 #     read = aclParseStr(readStr)
@@ -60,6 +54,15 @@ def aclUsersExist(aclStr):
 # def aclUnpack(domain):
 #     return reduce(lambda a, b: '' + a + '; ' + b, domain, '')
 
+
+def aclGetUsersList():
+    list = [{'id': '*', 'label': 'Любой (*)'}, {'id': '&', 'label': 'Владелец (&)'}]
+    userList = User.objects.all()
+    for u in userList:
+        list.append({'id': u.username, 'label': u.username})
+    return list
+
+
 # Проверить административные привилегии пользователя
 def isAdmin(user):
     # Администраторам - всегда разрешен
@@ -72,11 +75,15 @@ def isAdmin(user):
         return True, 'By admins group'
     return False, ''
 
+
 # Проверить ПРАВО
 def aclCheckRights(model, acl, user: User, domain):
     # Список доступа по домену
     aclUnpack = json.loads(acl)
-    accessList = aclUnpack[domain]
+    if domain in aclUnpack:
+        accessList = aclUnpack[domain]
+    else:
+        accessList = []
     if accessList is None:
         accessList = []
     # ВСЕ *
@@ -91,13 +98,21 @@ def aclCheckRights(model, acl, user: User, domain):
     # Админ
     return isAdmin(user)
 
+
 # Проверить право на чтение
 def aclCanRead(model, acl, user: User):
     return aclCheckRights(model, acl, user, 'read')
 
-# Проверить право на изменение Владельцем
+
+# Проверить право на создание
+def aclCanCrt(model, acl, user: User):
+    return aclCheckRights(model, acl, user, 'crt')
+
+
+# Проверить право на изменение
 def aclCanMod(model, acl, user: User):
     return aclCheckRights(model, acl, user, 'mod')
+
 
 # Проверить право на построение отчетов
 def aclCanReport(model, acl, user: User):
@@ -109,7 +124,7 @@ def aclCanReport(model, acl, user: User):
 class SecurityModelExt(models.Model):
     owner = models.ForeignKey(User, verbose_name='Владелец', null=True, blank=True, on_delete=models.SET_NULL)
     acl = models.CharField(verbose_name='Права доступа', max_length=1000,
-                           default='{"read": ["*"], "mod": ["&"], "report": ["*"] }')
+                           default='{"read": ["*"], "crt": ["*"], "mod": ["&"], "report": ["*"] }')
     #  ^  '*' все, '&' владелец
 
     class Meta:
