@@ -126,13 +126,13 @@ class CreateFinOper(graphene.Mutation):
         oper.project = project
         oper.owner = info.context.user
         oper.costType = CostType.objects.filter(parent=project.prefCostTypeGroup).order_by('order').first()
-        oper.agentFrom = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
-        oper.agentTo = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
+        # oper.agentFrom = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
+        # oper.agentTo = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
         oper.save()
         # Журнал
         logUserAction(info.context.user, FinOper, f"create id={oper.pk}", link=f"/finoper/{oper.pk}")
         # noinspection PyArgumentList
-        return UpdateFinOper(ok=True, result=f"Create {FinOper}, id={oper.pk}", newOperId=oper.pk)
+        return CreateFinOper(ok=True, result=f"Create {FinOper}, id={oper.pk}", newOperId=oper.pk)
 
 
 # Обновить фин операцию
