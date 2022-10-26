@@ -18,7 +18,7 @@ def uploadFinOperPhoto(request):
     # -- Безопасность токена JWT
     query = "mutation VerifyToken($token: String!) { verifyToken(token: $token) { payload } }"
     url = 'http://127.0.0.1:8000/gp/'
-    res = requests.post(url, json={'query': query, 'variables': {'token': token + 22}}).text
+    res = requests.post(url, json={'query': query, 'variables': {'token': token}}).text
     if 'error' in res or 'payload' not in res:
         raise Exception("Токен авторизации не действителен!")
     # -- Безопасность ACL
