@@ -104,6 +104,37 @@ class DeleteFinOper(graphene.Mutation):
         return DeleteFinOper(ok=True, result=f"Delete {FinOper}, id={id}")
 
 
+# Создать фин операцию
+class CreateFinOper(graphene.Mutation):
+    class Arguments:
+        projectId = graphene.Int()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+    newOperId = graphene.Int()
+
+    @login_required
+    def mutate(root, info, projectId):
+        # Создаем новую фин операцию
+        project = Project.objects.get(pk=projectId)
+        # -- Безопасность ACL
+        canCrt = aclCanCrt(project, project.acl, info.context.user)[0]
+        if not canCrt:
+            raise Exception("У вас нет прав на создание данного объекта!")
+        # --
+        oper = FinOper()
+        oper.project = project
+        oper.owner = info.context.user
+        oper.costType = CostType.objects.filter(parent=project.prefCostTypeGroup).order_by('order').first()
+        oper.agentFrom = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
+        oper.agentTo = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
+        oper.save()
+        # Журнал
+        logUserAction(info.context.user, FinOper, f"create id={oper.pk}", link=f"/finoper/{oper.pk}")
+        # noinspection PyArgumentList
+        return UpdateFinOper(ok=True, result=f"Create {FinOper}, id={oper.pk}", newOperId=oper.pk)
+
+
 # Обновить фин операцию
 class UpdateFinOper(graphene.Mutation):
     class Arguments:

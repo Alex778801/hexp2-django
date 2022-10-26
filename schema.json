@@ -2522,6 +2522,29 @@
                 {
                   "defaultValue": null,
                   "description": null,
+                  "name": "projectId",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                }
+              ],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "createFinoper",
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreateFinOper",
+                "ofType": null
+              }
+            },
+            {
+              "args": [
+                {
+                  "defaultValue": null,
+                  "description": null,
                   "name": "agentFromId",
                   "type": {
                     "kind": "SCALAR",
@@ -3209,6 +3232,53 @@
           "interfaces": [],
           "kind": "OBJECT",
           "name": "UpdateAgent",
+          "possibleTypes": null
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": [
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "ok",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "result",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "newOperId",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "kind": "OBJECT",
+          "name": "CreateFinOper",
           "possibleTypes": null
         },
         {
