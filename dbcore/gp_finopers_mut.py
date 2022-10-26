@@ -1,10 +1,15 @@
 import json
+import os
+
 import graphene
 from graphql_jwt.decorators import login_required
+import piexif
+
 
 from django.contrib.auth.models import User
-from dbcore.models import Project, Agent, CostType, FinOper, Photo
+from dbcore.models import Project, Agent, CostType, FinOper, Photo, getPhotoLocation
 from dbcore.models_base import isAdmin, aclCanRead, aclCanMod, aclCanCrt
+from dj import settings
 from ua.models import logUserAction, modelDiff
 
 
@@ -98,6 +103,7 @@ class DeleteFinOper(graphene.Mutation):
         return DeleteFinOper(ok=True, result=f"Delete {FinOper}, id={id}")
 
 
+
 # Создать/обновить фин операцию
 class UpdateFinOper(graphene.Mutation):
     class Arguments:
@@ -154,3 +160,77 @@ class UpdateFinOper(graphene.Mutation):
         else:
             # noinspection PyArgumentList
             return UpdateFinOper(ok=True, result=f"Update {FinOper}, id={oper.pk}")
+
+
+
+# Действия с фото фин операции
+class photoAction(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        action = graphene.Int()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    @login_required
+    def mutate(root, info, id, action):
+        # Операция с фото: 1 - удалить, 2 - вращать вправо, 3 - вращать влево
+        actionsList = ['nothing', 'delete', 'rot right', 'rot left']
+        photo = Photo.objects.get(pk=id)
+        # -------------------------------------------------------------------
+        # Удаление фото
+        if action == 1:
+            Photo.objects.get(pk=id).delete()
+        # -------------------------------------------------------------------
+        # Вращение фото
+        if action == 2 or action == 3:
+            try:
+                # Когда есть exif инфо об ориентации
+                exif_dict = piexif.load(photo.image.path)
+                oldAngle = exif_dict['0th'][274]
+                newAngle = 1
+                # Вправо - по часовой
+                if action == 2:
+                    if oldAngle == 1:
+                        newAngle = 8
+                    elif oldAngle == 8:
+                        newAngle = 3
+                    elif oldAngle == 3:
+                        newAngle = 6
+                    elif oldAngle == 6:
+                        newAngle = 1
+                # Влево - против часовой
+                elif action == 3:
+                    if oldAngle == 1:
+                        newAngle = 6
+                    elif oldAngle == 6:
+                        newAngle = 3
+                    elif oldAngle == 3:
+                        newAngle = 8
+                    elif oldAngle == 8:
+                        newAngle = 1
+                exif_dict['0th'][274] = newAngle
+                exif_bytes = piexif.dump(exif_dict)
+                piexif.insert(exif_bytes, photo.image.path)
+            except:
+                # Когда нет exif инфо
+                newAngle = 1
+                if action == 2:
+                    newAngle = 8
+                elif action == 3:
+                    newAngle = 6
+                exif_dict = {"0th": {274: newAngle}}
+                # exif_dict['0th'][274] = newAngle
+                exif_bytes = piexif.dump(exif_dict)
+                piexif.insert(exif_bytes, photo.image.path)
+            # Переименуем файл фото, чтобы не было проблем с кэшем браузеров
+            oldName = f'{settings.MEDIA_ROOT}/{photo.image}'
+            localName = getPhotoLocation(photo, oldName)
+            newName = f'{settings.MEDIA_ROOT}/{localName}'
+            os.rename(oldName, newName)
+            photo.image = localName
+            photo.save()
+            # --
+        logUserAction(info.context.user, Photo, f"photo {actionsList[action]}, id={id}", link=f"/finoper/{photo.finOper.project_id}")
+        # noinspection PyArgumentList
+        return photoAction(ok=True, result=f"photo action {actionsList[action]}, id={id}")

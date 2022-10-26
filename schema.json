@@ -382,9 +382,13 @@
               "isDeprecated": false,
               "name": "project",
               "type": {
-                "kind": "OBJECT",
-                "name": "ProjectType",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ProjectType",
+                  "ofType": null
+                }
               }
             },
             {
@@ -484,6 +488,30 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
+              "name": "photoSet",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "FinOperPhotoType",
+                      "ofType": null
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
               "name": "ts",
               "type": {
                 "kind": "SCALAR",
@@ -537,6 +565,22 @@
                 "kind": "SCALAR",
                 "name": "Int",
                 "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "photoList",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "FinOperPhotoType",
+                  "ofType": null
+                }
               }
             },
             {
@@ -1871,6 +1915,65 @@
           "enumValues": null,
           "fields": [
             {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "id",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "finOper",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "FinOperType",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "image",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              }
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "kind": "OBJECT",
+          "name": "FinOperPhotoType",
+          "possibleTypes": null
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": [
+            {
               "args": [
                 {
                   "defaultValue": null,
@@ -2591,15 +2694,11 @@
                 {
                   "defaultValue": null,
                   "description": null,
-                  "name": "file",
+                  "name": "action",
                   "type": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "Upload",
-                      "ofType": null
-                    }
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
                   }
                 },
                 {
@@ -2616,10 +2715,10 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
-              "name": "uploadMutation",
+              "name": "photoAction",
               "type": {
                 "kind": "OBJECT",
-                "name": "UploadMutation",
+                "name": "photoAction",
                 "ofType": null
               }
             }
@@ -3284,17 +3383,7 @@
           "inputFields": null,
           "interfaces": [],
           "kind": "OBJECT",
-          "name": "UploadMutation",
-          "possibleTypes": null
-        },
-        {
-          "description": "Create scalar that ignores normal serialization/deserialization, since\nthat will be handled by the multipart request spec",
-          "enumValues": null,
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "kind": "SCALAR",
-          "name": "Upload",
+          "name": "photoAction",
           "possibleTypes": null
         },
         {
