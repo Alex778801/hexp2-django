@@ -22,7 +22,10 @@ from graphene_django.views import GraphQLView
 from dbcore.views import uploadFinOperPhoto
 
 urlpatterns = [
+    # Интерфейс администратора
     path('admin/', admin.site.urls),
+    # Отладочный интерфей graphql
     path('gp/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    # Загрузить фото фин операции
     path('uploadFinOperPhoto/', csrf_exempt(uploadFinOperPhoto))
 ]
