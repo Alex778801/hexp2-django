@@ -69,7 +69,7 @@ class Mutation(graphene.ObjectType):
     update_agent = UpdateAgent.Field()
     # -----------------------------------------------------
     # ФИНАНСОВЫЕ ОПЕРАЦИИ
-    # Создать/обновить фин операцию
+    # Обновить фин операцию
     update_finoper = UpdateFinOper.Field()
     # Переместить фин операцию в другой проект
     move_finoper = MoveFinOper.Field()
@@ -79,6 +79,7 @@ class Mutation(graphene.ObjectType):
     delete_finoper = DeleteFinOper.Field()
     # Действия с фото фин операции
     photo_action = photoAction.Field()
+    # Обновить фин операцию
 
 
 # ----------------------------------------------------------------------------------------------------------------------

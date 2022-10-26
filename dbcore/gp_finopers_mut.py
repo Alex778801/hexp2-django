@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 import graphene
 from graphql_jwt.decorators import login_required
@@ -103,64 +104,42 @@ class DeleteFinOper(graphene.Mutation):
         return DeleteFinOper(ok=True, result=f"Delete {FinOper}, id={id}")
 
 
-
-# Создать/обновить фин операцию
+# Обновить фин операцию
 class UpdateFinOper(graphene.Mutation):
     class Arguments:
         id = graphene.Int()
-        projectId = graphene.Int()
         ts = graphene.Int()
         costTypeId = graphene.Int()
         agentFromId = graphene.Int()
         agentToId = graphene.Int()
-        amount = graphene.String()
+        amount = graphene.Int()
         notes = graphene.String()
+        user = graphene.String()
 
     ok = graphene.Boolean()
     result = graphene.String()
 
     @login_required
-    def mutate(root, info, id, projectId, ts, costTypeId, agentFromId, agentToId, amount, notes):
-        if id == -1:
-            # Создаем новую фин операцию
-            project = Project.objects.get(pk=projectId)
-            # -- Безопасность ACL
-            canCrt = aclCanCrt(project, project.acl, info.context.user)[0]
-            if not canCrt:
-                raise Exception("У вас нет прав на создание данного объекта!")
-            # --
-            oper = FinOper()
-            oper.project = project
-            oper.owner = info.context.user
-            oper.costType = CostType.objects.filter(parent=project.prefCostTypeGroup).first()
-        else:
-            # Обновляем существующую фин операцию
-            oper = FinOper.objects.get(pk=id)
-            # -- Безопасность ACL
-            canMod = aclCanMod(oper, oper.project.acl, info.context.user)[0]
-            if not canMod:
-                raise Exception("У вас нет прав на модификацию данного объекта!")
+    def mutate(root, info, id, ts, costTypeId=None, agentFromId=None, agentToId=None, amount=0, notes=None, user=None):
+        oper = FinOper.objects.get(pk=id)
+        # -- Безопасность ACL
+        canMod = aclCanMod(oper, oper.project.acl, info.context.user)[0]
+        if not canMod:
+            raise Exception("У вас нет прав на модификацию данного объекта!")
         # ---------
-
-
+        oper.moment = datetime.fromtimestamp(ts)
+        oper.costType_id = costTypeId
+        oper.agentFrom_id = agentFromId
+        oper.agentTo_id = agentToId
+        oper.amount = amount
+        oper.notes = notes
+        oper.owner = User.objects.filter(username=user).first()
         # Журнал
-        if id == -1:
-            logUserAction(info.context.user, FinOper, f"create id={oper.pk}",
-                          link=f"/finoper/{oper.pk}")
-        else:
-            diff = modelDiff(FinOper.objects.get(pk=oper.pk), oper)
-            oper.save()
-            logUserAction(info.context.user, FinOper, f"update id={oper.pk}",
-                          diff=diff,
-                          link=f"/finoper/{oper.pk}")
-        # Возврат
-        if id == -1:
-            # noinspection PyArgumentList
-            return UpdateFinOper(ok=True, result=f"Create {FinOper}, id={oper.pk}")
-        else:
-            # noinspection PyArgumentList
-            return UpdateFinOper(ok=True, result=f"Update {FinOper}, id={oper.pk}")
-
+        diff = modelDiff(FinOper.objects.get(pk=oper.pk), oper)
+        oper.save()
+        logUserAction(info.context.user, FinOper, f"update id={oper.pk}", diff=diff, link=f"/finoper/{oper.pk}")
+        # noinspection PyArgumentList
+        return UpdateFinOper(ok=True, result=f"Update {FinOper}, id={oper.pk}")
 
 
 # Действия с фото фин операции
