@@ -55,7 +55,7 @@ class FinOperType(DjangoObjectType):
 
     # Метка времени операции в формате unix
     def resolve_ts(self: FinOper, info):
-        return self.moment.timestamp()
+        return int(self.moment.timestamp())
 
     # Метка времени операции в формате js
     def resolve_tsjs(self: FinOper, info):
