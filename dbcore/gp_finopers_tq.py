@@ -5,7 +5,7 @@ from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 
 from dbcore.gp_catalogs_tq import CostTypeType, AgentType, ProjectType
-from dbcore.models import Project, Agent, CostType, FinOper
+from dbcore.models import Project, Agent, CostType, FinOper, Photo
 from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin, aclCanRead, aclCanMod
 
 import json
@@ -30,6 +30,13 @@ from dj.myutils import parseTsIntv
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Фото финансовой операции
+class FinOperPhotoType(DjangoObjectType):
+
+    class Meta:
+        model = Photo
+
+
 # Финансовая операция
 class FinOperType(DjangoObjectType):
     class Meta:
@@ -40,7 +47,7 @@ class FinOperType(DjangoObjectType):
     user = graphene.String()
     ucol = graphene.String()
     pq = graphene.Int()
-    project = graphene.Field(ProjectType)
+    photoList = graphene.List(FinOperPhotoType)
     ctList = graphene.List(CostTypeType)
     agList = graphene.List(AgentType)
     aclList = graphene.String()
@@ -55,28 +62,12 @@ class FinOperType(DjangoObjectType):
         return self.moment
 
     # Владелец операции
-    def resolve_user(self: Agent, info):
+    def resolve_user(self: FinOper, info):
         return self.owner.username if self.owner is not None else None
 
     # Цвет владельца операции
     def resolve_ucol(self: FinOper, info):
         return self.owner.userattr.color
-
-    # Колво фото у операции
-    def resolve_pq(self: FinOper, info):
-        return self.photo_set.all().count()
-
-    # Проект (к которому принадлежит операция)
-    def resolve_project(self: FinOper, info):
-        return self.project
-
-    # Список статей для выбора
-    def resolve_ctList(self: FinOper, info):
-        return CostType.objects.filter(parent=self.project.prefCostTypeGroup)
-
-    # Список агентов для выбора
-    def resolve_agList(self: FinOper, info):
-        return Agent.objects.filter(parent=self.project.prefAgentGroup)
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: FinOper, info):
@@ -87,6 +78,22 @@ class FinOperType(DjangoObjectType):
     # Разрешено только чтение
     def resolve_readOnly(self: FinOper, info):
         return not aclCanMod(self, self.project.acl, info.context.user)
+
+    # Колво фото у операции
+    def resolve_pq(self: FinOper, info):
+        return self.photo_set.all().count()
+
+    # Список фото
+    def resolve_photoList(self: FinOper, info):
+        return Photo.objects.filter(finOper=self)
+
+    # Список статей для выбора
+    def resolve_ctList(self: FinOper, info):
+        return CostType.objects.filter(parent=self.project.prefCostTypeGroup)
+
+    # Список агентов для выбора
+    def resolve_agList(self: FinOper, info):
+        return Agent.objects.filter(parent=self.project.prefAgentGroup)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
