@@ -46,6 +46,7 @@ class FinOperType(DjangoObjectType):
     tsjs = graphene.DateTime()
     user = graphene.String()
     ucol = graphene.String()
+    amount = graphene.Int()
     pq = graphene.Int()
     photoList = graphene.List(FinOperPhotoType)
     ctList = graphene.List(CostTypeType)
@@ -68,6 +69,10 @@ class FinOperType(DjangoObjectType):
     # Цвет владельца операции
     def resolve_ucol(self: FinOper, info):
         return self.owner.userattr.color
+
+    # Сумма приведенная в инт. В оригинале десимал
+    def resolve_amount(self: FinOper, info):
+        return int(self.amount)
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: FinOper, info):
