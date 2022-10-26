@@ -1,3 +1,6 @@
+import os
+import random
+
 from django.contrib.auth.models import User
 from django_resized import ResizedImageField
 from django.utils import timezone
@@ -104,12 +107,17 @@ class FinOper(SecurityModelExt):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Формирование имени файла фото
+def getPhotoLocation(instance, filename):
+    name, ext = os.path.splitext(filename)
+    rand = random.randrange(100000000000, 900000000000, 1)
+    newName = f'{instance.finOper.project_id}-{instance.finOper_id}-{rand}'
+    return f'finoper_photo/{newName}{ext}'
+
 # Фото финансовых операций
 class Photo(models.Model):
     finOper = models.ForeignKey(FinOper, verbose_name='Операция', on_delete=models.CASCADE)
-    image = ResizedImageField(verbose_name='Фото', upload_to='finoper_photo')
-
-    # image = ResizedImageField(verbose_name='Фото', upload_to=randomFileName('finoper_photo'))
+    image = ResizedImageField(verbose_name='Фото', upload_to=getPhotoLocation)
 
     def __str__(self):
         return str(self.finOper.notes or '') + ' = ' + str(self.finOper.amount or '') + '; фото: ' + self.image.name
