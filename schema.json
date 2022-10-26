@@ -2545,7 +2545,7 @@
                   "name": "amount",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "String",
+                    "name": "Int",
                     "ofType": null
                   }
                 },
@@ -2582,7 +2582,7 @@
                 {
                   "defaultValue": null,
                   "description": null,
-                  "name": "projectId",
+                  "name": "ts",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
@@ -2592,10 +2592,10 @@
                 {
                   "defaultValue": null,
                   "description": null,
-                  "name": "ts",
+                  "name": "user",
                   "type": {
                     "kind": "SCALAR",
-                    "name": "Int",
+                    "name": "String",
                     "ofType": null
                   }
                 }
