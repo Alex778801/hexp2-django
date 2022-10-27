@@ -4,7 +4,7 @@ from graphql_jwt.decorators import login_required
 
 from django.contrib.auth.models import User
 from dbcore.models import Project, Agent, CostType
-from dbcore.models_base import isAdmin
+from dbcore.models_base import isAdmin, aclCanMod
 from ua.models import logUserAction, modelDiff
 
 
@@ -245,6 +245,28 @@ class UpdateProject(graphene.Mutation):
         # noinspection PyArgumentList
         return UpdateProject(ok=True, result=f"Update in {Project}, id={project.pk}")
 
+# Обновить Заметки проекта
+class UpdateProjectInfo(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        projinfo = graphene.String()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    @login_required
+    def mutate(root, info, id, projinfo):
+        project = Project.objects.get(pk=id)
+        # -- Безопасность ACL
+        canMod = aclCanMod(project, project.acl, info.context.user)[0]
+        if not canMod:
+            raise Exception("У вас нет прав на изменение данного объекта!")
+        # --
+        project.info = projinfo
+        project.save()
+        logUserAction(info.context.user, Project, f"modify project info '{project.pk}:{project.name}'", link=f"/project/{project.pk}")
+        # noinspection PyArgumentList
+        return UpdateProject(ok=True, result=f"Modify project info in {Project}, id={project.pk}")
 
 # Обновить - СТАТЬЯ
 class UpdateCostType(graphene.Mutation):
