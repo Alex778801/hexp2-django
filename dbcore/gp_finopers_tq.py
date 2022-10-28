@@ -5,7 +5,7 @@ from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 
 from dbcore.gp_catalogs_tq import CostTypeType, AgentType, ProjectType
-from dbcore.models import Project, Agent, CostType, FinOper, Photo
+from dbcore.models import Project, Agent, CostType, FinOper, Photo, Budget
 from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin, aclCanRead, aclCanMod
 
 import json
@@ -106,7 +106,14 @@ class FinOperType(DjangoObjectType):
         # return Agent.objects.filter(parent=self.project.prefAgentGroup)
         return res
 
-# ----------------------------------------------------------------------------------------------------------------------
+
+# Позиция бюджета
+class BudgetLineType(DjangoObjectType):
+
+    class Meta:
+        model = Budget
+
+    # ----------------------------------------------------------------------------------------------------------------------
 # ЗАПРОСЫ
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -114,6 +121,7 @@ class FinOperType(DjangoObjectType):
 class FinOpersQuery(graphene.ObjectType):
     finoper = graphene.Field(FinOperType, id=graphene.Int())
     finopers = graphene.List(FinOperType, projectId=graphene.Int(), tsBegin=graphene.Int(), tsEnd=graphene.Int())
+    budget = graphene.List(BudgetLineType, projectId=graphene.Int())
 
     # Финансовая операция
     @login_required
@@ -138,3 +146,14 @@ class FinOpersQuery(graphene.ObjectType):
         # --
         tsBegin, tsEnd = parseTsIntv(tsBegin, tsEnd, project.prefFinOperLogIntv, project.prefFinOperLogIntv_n)
         return FinOper.objects.filter(project=project, moment__gte=tsBegin, moment__lte=tsEnd)
+
+    # Бюджет проекта
+    @login_required
+    def resolve_budget(self, info, projectId):
+        project = Project.objects.get(pk=projectId)
+        # -- Безопасность ACL
+        canRead = aclCanRead(project, project.acl, info.context.user)[0]
+        if not canRead:
+            raise Exception("У вас нет прав на просмотр данного объекта!")
+        # --
+        return Budget.objects.filter(project=project)
