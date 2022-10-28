@@ -94,12 +94,17 @@ class FinOperType(DjangoObjectType):
 
     # Список статей для выбора
     def resolve_ctList(self: FinOper, info):
-        return CostType.objects.filter(parent=self.project.prefCostTypeGroup)
+        res = (CostType.objects.filter(parent=self.project.prefCostTypeGroup, isGrp=False)
+              | CostType.objects.filter(parent=None, isGrp=False)).order_by('parent', 'order')
+        # return CostType.objects.filter(parent=self.project.prefCostTypeGroup)
+        return res
 
     # Список агентов для выбора
     def resolve_agList(self: FinOper, info):
-        return Agent.objects.filter(parent=self.project.prefAgentGroup)
-
+        res = (Agent.objects.filter(parent=self.project.prefAgentGroup, isGrp=False)
+              | Agent.objects.filter(parent=None, isGrp=False)).order_by('parent', 'order')
+        # return Agent.objects.filter(parent=self.project.prefAgentGroup)
+        return res
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ЗАПРОСЫ
