@@ -55,6 +55,6 @@ def uploadProjectInfo(request):
     newName = f'{projectId}-{rand}'
     fileName = default_storage.save(f'{settings.PROJECT_INFO_DIR}/{newName}{ext}', file)
     # resFileName = settings.BACKEND_ADDR + str(settings.MEDIA_URL) + fileName
-    resFileName = fileName
+    resFileName = str(settings.MEDIA_URL) + fileName
     response = {'url': resFileName}
     return HttpResponse(json.dumps(response), content_type="json", status=200)
