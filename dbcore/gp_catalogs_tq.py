@@ -53,8 +53,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     prefAgentGroupTree = graphene.String()
     tree = graphene.String()
     logIntervalList = graphene.String()
-    owner = graphene.String()
-    ownerId = graphene.Int()
+    user = graphene.String()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
 
@@ -74,20 +73,15 @@ class ProjectType(DjangoObjectType, CustomCat):
         res = json.dumps(tmp, ensure_ascii=True)
         return res
 
-
     # Интервалы журнала
     def resolve_logIntervalList(self: Project, info):
         tmp = list(map(lambda i: {'id': i['id'].value, 'label': i['fn']}, Project.Ext.logIntv))
         res = json.dumps(tmp, ensure_ascii=True)
         return res
 
-    # Владелец
-    def resolve_owner(self: Project, info):
+    # Владелец - текстовое представление объекта owner
+    def resolve_user(self: Project, info):
         return self.owner.username
-
-    # Ид владельца
-    def resolve_ownerId(self: Project, info):
-        return self.owner.id
 
 
     # Список пользователей и служебных записей авторизации
@@ -109,7 +103,7 @@ class CostTypeType(DjangoObjectType, CustomCat):
 
     path = graphene.String()
     out = graphene.Boolean()
-    owner = graphene.String()
+    user = graphene.String()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
 
@@ -121,9 +115,9 @@ class CostTypeType(DjangoObjectType, CustomCat):
     def resolve_out(self: CostType, info):
         return self.isOutcome
 
-    # Владелец
-    def resolve_owner(self: CostType, info):
-        return self.owner.username if self.owner is not None else None
+    # Владелец - текстовое представление объекта owner
+    def resolve_user(self: Project, info):
+        return self.owner.username
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: CostType, info):
@@ -143,7 +137,7 @@ class AgentType(DjangoObjectType, CustomCat):
         model = Agent
 
     path = graphene.String()
-    owner = graphene.String()
+    user = graphene.String()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
 
@@ -151,9 +145,9 @@ class AgentType(DjangoObjectType, CustomCat):
     def resolve_path(self: Agent, info):
         return self.getParentsList()
 
-    # Владелец
-    def resolve_owner(self: Agent, info):
-        return self.owner.username if self.owner is not None else None
+    # Владелец - текстовое представление объекта owner
+    def resolve_user(self: Project, info):
+        return self.owner.username
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: Agent, info):

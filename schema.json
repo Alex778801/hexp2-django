@@ -984,8 +984,8 @@
               "isDeprecated": false,
               "name": "owner",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "OBJECT",
+                "name": "UserType",
                 "ofType": null
               }
             },
@@ -1274,18 +1274,6 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
-                "ofType": null
-              }
-            },
-            {
-              "args": [],
-              "deprecationReason": null,
-              "description": null,
-              "isDeprecated": false,
-              "name": "ownerId",
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
                 "ofType": null
               }
             },

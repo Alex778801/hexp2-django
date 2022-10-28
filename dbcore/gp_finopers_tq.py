@@ -68,7 +68,7 @@ class FinOperType(DjangoObjectType):
 
     # Цвет владельца операции
     def resolve_ucol(self: FinOper, info):
-        return self.owner.userattr.color
+        return self.owner.userattr.color if self.owner is not None else None
 
     # Сумма приведенная в инт. В оригинале десимал
     def resolve_amount(self: FinOper, info):

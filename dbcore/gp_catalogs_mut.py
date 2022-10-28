@@ -224,16 +224,16 @@ class UpdateProject(graphene.Mutation):
     result = graphene.String()
 
     @login_required
-    def mutate(root, info, id, name, prefCostTypeGroup, prefAgentGroup,
-               prefFinOperLogIntv, prefFinOperLogIntvN, owner, acl):
+    def mutate(root, info, id, name, owner, acl,
+               prefCostTypeGroup=None, prefAgentGroup=None, prefFinOperLogIntv=None, prefFinOperLogIntvN=1):
         project = Project.objects.get(pk=id)
         # Изменять может только админ или владелец!
         if not isAdmin(info.context.user) and not info.context.user == project.owner and project.owner is not None:
             raise Exception("У вас нет прав на изменение данного объекта!")
         # --
         project.name = name
-        project.prefCostTypeGroup = None if prefCostTypeGroup == -1 else CostType.objects.get(pk=prefCostTypeGroup)
-        project.prefAgentGroup = None if prefAgentGroup == -1 else Agent.objects.get(pk=prefAgentGroup)
+        project.prefCostTypeGroup = CostType.objects.filter(pk=prefCostTypeGroup).first()
+        project.prefAgentGroup = Agent.objects.filter(pk=prefAgentGroup).first()
         project.prefFinOperLogIntv = prefFinOperLogIntv
         project.prefFinOperLogIntv_n = prefFinOperLogIntvN
         project.acl = acl
