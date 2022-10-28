@@ -1282,6 +1282,18 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
+              "name": "user",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
               "name": "aclList",
               "type": {
                 "kind": "SCALAR",
@@ -1341,8 +1353,8 @@
               "isDeprecated": false,
               "name": "owner",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "OBJECT",
+                "name": "UserType",
                 "ofType": null
               }
             },
@@ -1591,6 +1603,18 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
+              "name": "user",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
               "name": "aclList",
               "type": {
                 "kind": "SCALAR",
@@ -1640,8 +1664,8 @@
               "isDeprecated": false,
               "name": "owner",
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "OBJECT",
+                "name": "UserType",
                 "ofType": null
               }
             },
@@ -1859,6 +1883,18 @@
               "description": null,
               "isDeprecated": false,
               "name": "path",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "user",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
