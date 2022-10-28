@@ -20,7 +20,7 @@ from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
-from dbcore.views import uploadFinOperPhoto
+from dbcore.views import uploadFinOperPhoto, uploadProjectInfo
 from dj import settings
 
 urlpatterns = [
@@ -29,7 +29,9 @@ urlpatterns = [
     # Отладочный интерфей graphql
     path('gp/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     # Загрузить фото фин операции
-    path('uploadFinOperPhoto/', csrf_exempt(uploadFinOperPhoto))
+    path('uploadFinOperPhoto/', csrf_exempt(uploadFinOperPhoto)),
+    # Загрузить объекты текстового редактора CKE из заметок проекта Project.info
+    path('uploadProjectInfo/', csrf_exempt(uploadProjectInfo))
 ]
 
 # Для доступа к медиа файлам в режиме разработки

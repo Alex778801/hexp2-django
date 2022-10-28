@@ -54,6 +54,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     tree = graphene.String()
     logIntervalList = graphene.String()
     owner = graphene.String()
+    ownerId = graphene.Int()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
 
@@ -82,7 +83,12 @@ class ProjectType(DjangoObjectType, CustomCat):
 
     # Владелец
     def resolve_owner(self: Project, info):
-        return self.owner.username if self.owner is not None else None
+        return self.owner.username
+
+    # Ид владельца
+    def resolve_ownerId(self: Project, info):
+        return self.owner.id
+
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: Project, info):
