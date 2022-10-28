@@ -190,4 +190,4 @@ BACKEND_ADDR = 'http://192.168.1.222:8000'
 FINOPER_PHOTO_DIR = 'finoper_photo'
 
 # Папка в MEDIA с объектами редатора CKE
-PROJECT_INFO_DIR = 'project_info'
+PROJECT_INFO_DIR = 'projectinfo_media'
