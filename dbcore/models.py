@@ -4,6 +4,8 @@ import random
 from django.contrib.auth.models import User
 from django_resized import ResizedImageField
 from django.utils import timezone
+
+from dj import settings
 from .models_base import *
 
 from dj.myutils import LogIntv
@@ -112,7 +114,7 @@ def getPhotoLocation(instance, filename):
     name, ext = os.path.splitext(filename)
     rand = random.randrange(100000000000, 900000000000, 1)
     newName = f'{instance.finOper.project_id}-{instance.finOper_id}-{rand}'
-    return f'finoper_photo/{newName}{ext}'
+    return f'{settings.FINOPER_PHOTO_DIR}/{newName}{ext}'
 
 # Фото финансовых операций
 class Photo(models.Model):
