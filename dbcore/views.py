@@ -44,14 +44,15 @@ def uploadFinOperPhoto(request):
 
 def uploadProjectInfo(request):
     token = request.POST['token']
+    projectId = int(request.POST['projectId'])
     # -- Безопасность токена JWT
     if not checkJwtToken(token):
         raise Exception("Токен авторизации не действителен!")
     # --
     file = request.FILES['file']
     name, ext = os.path.splitext(file.name)
-    rand = random.randrange(100000000000000, 900000000000000, 1)
-    newName = f'{rand}'
+    rand = random.randrange(100000000000, 900000000000, 1)
+    newName = f'{projectId}-{rand}'
     fileName = default_storage.save(f'{settings.PROJECT_INFO_DIR}/{newName}{ext}', file)
     # resFileName = settings.BACKEND_ADDR + str(settings.MEDIA_URL) + fileName
     resFileName = fileName
