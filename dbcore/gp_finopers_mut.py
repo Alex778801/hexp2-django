@@ -8,7 +8,7 @@ import piexif
 
 
 from django.contrib.auth.models import User
-from dbcore.models import Project, Agent, CostType, FinOper, Photo, getPhotoLocation
+from dbcore.models import Project, Agent, CostType, FinOper, Photo, getPhotoLocation, Budget
 from dbcore.models_base import isAdmin, aclCanRead, aclCanMod, aclCanCrt
 from dj import settings
 from ua.models import logUserAction, modelDiff
@@ -174,7 +174,7 @@ class UpdateFinOper(graphene.Mutation):
 
 
 # Действия с фото фин операции
-class photoAction(graphene.Mutation):
+class PhotoAction(graphene.Mutation):
     class Arguments:
         id = graphene.Int()
         action = graphene.Int()
@@ -243,4 +243,44 @@ class photoAction(graphene.Mutation):
             # --
         logUserAction(info.context.user, Photo, f"photo {actionsList[action]}, id={id}", link=f"/finoper/{photo.finOper.project_id}")
         # noinspection PyArgumentList
-        return photoAction(ok=True, result=f"photo action {actionsList[action]}, id={id}")
+        return PhotoAction(ok=True, result=f"photo action {actionsList[action]}, id={id}")
+
+
+# Обновить бюджет проекта
+class UpdateBudget(graphene.Mutation):
+    class Arguments:
+        projectId = graphene.Int()
+        budgetPack = graphene.String()
+        deletedPack = graphene.String()
+
+    ok = graphene.Boolean()
+    result = graphene.String()
+
+    @login_required
+    def mutate(root, info, projectId, budgetPack, deletedPack):
+        project = Project.objects.get(pk=projectId)
+        # -- Безопасность ACL
+        canMod = aclCanMod(project, project.acl, info.context.user)[0]
+        if not canMod:
+            raise Exception("У вас нет прав на модификацию данного объекта!")
+        # Создадим новые и обновим существующие
+        budgets = json.loads(budgetPack)
+        for budgetLine in budgets:
+            if budgetLine['id'] == -1:
+                budget = Budget()
+                budget.project = project
+            else:
+                budget = Budget.objects.get(pk=budgetLine['id'])
+            budget.costType_id = budgetLine['costType']['id']
+            budget.order = budgetLine['order']
+            budget.amount = budgetLine['amount']
+            budget.notes = budgetLine['notes']
+            budget.save()
+        # Удалим помеченные на удаление
+        deletes = json.loads(deletedPack)
+        for delete in deletes:
+            Budget.objects.get(pk=delete).delete()
+        # Журнал
+        logUserAction(info.context.user, Budget, f"update project id={projectId}", link=f"/budget/{projectId}")
+        # noinspection PyArgumentList
+        return UpdateBudget(ok=True, result=f"Update {Budget}, projectd id={projectId}")
