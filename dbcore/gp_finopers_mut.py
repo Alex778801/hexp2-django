@@ -275,12 +275,20 @@ class UpdateBudget(graphene.Mutation):
             budget.order = budgetLine['order']
             budget.amount = budgetLine['amount']
             budget.notes = budgetLine['notes']
+            # Журнал - обновление
+            if budgetLine['id'] != -1:
+                diff = modelDiff(Budget.objects.get(pk=budget.pk), budget)
+                if diff != '':
+                    logUserAction(info.context.user, Budget, f"update budget, id={budget.pk}", diff=diff, link=f"/budget/{projectId}")
             budget.save()
+            # Журнал - новый
+            if budgetLine['id'] == -1:
+                logUserAction(info.context.user, Budget, f"new budget, id={budget.pk}", diff=budget, link=f"/budget/{projectId}")
         # Удалим помеченные на удаление
         deletes = json.loads(deletedPack)
         for delete in deletes:
-            Budget.objects.get(pk=delete).delete()
-        # Журнал
-        logUserAction(info.context.user, Budget, f"update project id={projectId}", link=f"/budget/{projectId}")
+            budget = Budget.objects.get(pk=delete)
+            logUserAction(info.context.user, Budget, f"delete budget, id={budget.pk}", diff=budget, link=f"/budget/{projectId}")
+            budget.delete()
         # noinspection PyArgumentList
         return UpdateBudget(ok=True, result=f"Update {Budget}, projectd id={projectId}")
