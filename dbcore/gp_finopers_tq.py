@@ -110,8 +110,13 @@ class FinOperType(DjangoObjectType):
 # Позиция бюджета
 class BudgetLineType(DjangoObjectType):
 
+    amount = graphene.Int()
+
     class Meta:
         model = Budget
+
+    def resolve_amount(self: Budget, info):
+        return int(self.amount) if self.amount is not None else None
 
     # ----------------------------------------------------------------------------------------------------------------------
 # ЗАПРОСЫ
