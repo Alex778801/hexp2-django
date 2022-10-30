@@ -43,59 +43,6 @@ class CustomCat:
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Проект
-class ProjectType(DjangoObjectType, CustomCat):
-    class Meta:
-        model = Project
-
-    path = graphene.String()
-    prefCostTypeGroupTree = graphene.String()
-    prefAgentGroupTree = graphene.String()
-    tree = graphene.String()
-    logIntervalList = graphene.String()
-    user = graphene.String()
-    aclList = graphene.String()
-    readOnly = graphene.Boolean()
-
-    # Путь к проекту
-    def resolve_path(self: Project, info):
-        return self.getParentsList()
-
-    # Дерево групп Статей
-    def resolve_prefCostTypeGroupTree(self: Project, info):
-        tmp = CostType.getGroupsTree()
-        res = json.dumps(tmp, ensure_ascii=True)
-        return res
-
-    # Дерево групп Агентов
-    def resolve_prefAgentGroupTree(self: Project, info):
-        tmp = Agent.getGroupsTree()
-        res = json.dumps(tmp, ensure_ascii=True)
-        return res
-
-    # Интервалы журнала
-    def resolve_logIntervalList(self: Project, info):
-        tmp = list(map(lambda i: {'id': i['id'].value, 'label': i['fn']}, Project.Ext.logIntv))
-        res = json.dumps(tmp, ensure_ascii=True)
-        return res
-
-    # Владелец - текстовое представление объекта owner
-    def resolve_user(self: Project, info):
-        return self.owner.username
-
-
-    # Список пользователей и служебных записей авторизации
-    def resolve_aclList(self: Project, info):
-        tmp = aclGetUsersList()
-        res = json.dumps(tmp, ensure_ascii=True)
-        return res
-
-    # Разрешено только чтение
-    def resolve_readOnly(self: Project, info):
-        return not isAdmin(info.context.user)[0] and not self.owner == info.context.user and self.owner is not None
-
-
-# ----------------------------------------------------------------------------------------------------------------------
 # Статья
 class CostTypeType(DjangoObjectType, CustomCat):
     class Meta:
@@ -157,6 +104,66 @@ class AgentType(DjangoObjectType, CustomCat):
 
     # Разрешено только чтение
     def resolve_readOnly(self: Agent, info):
+        return not isAdmin(info.context.user)[0] and not self.owner == info.context.user and self.owner is not None
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Проект
+class ProjectType(DjangoObjectType, CustomCat):
+    class Meta:
+        model = Project
+
+    path = graphene.String()
+    prefCostTypeGroupTree = graphene.String()
+    ctList = graphene.List(CostTypeType)
+    prefAgentGroupTree = graphene.String()
+    tree = graphene.String()
+    logIntervalList = graphene.String()
+    user = graphene.String()
+    aclList = graphene.String()
+    readOnly = graphene.Boolean()
+
+    # Путь к проекту
+    def resolve_path(self: Project, info):
+        return self.getParentsList()
+
+    # Дерево групп Статей
+    def resolve_prefCostTypeGroupTree(self: Project, info):
+        tmp = CostType.getGroupsTree()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Список статей для выбора
+    def resolve_ctList(self: Project, info):
+        res = (CostType.objects.filter(parent=self.prefCostTypeGroup, isGrp=False)
+              | CostType.objects.filter(parent=None, isGrp=False)).order_by('parent', 'order')
+        return res
+
+    # Дерево групп Агентов
+    def resolve_prefAgentGroupTree(self: Project, info):
+        tmp = Agent.getGroupsTree()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Интервалы журнала
+    def resolve_logIntervalList(self: Project, info):
+        tmp = list(map(lambda i: {'id': i['id'].value, 'label': i['fn']}, Project.Ext.logIntv))
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Владелец - текстовое представление объекта owner
+    def resolve_user(self: Project, info):
+        return self.owner.username
+
+
+    # Список пользователей и служебных записей авторизации
+    def resolve_aclList(self: Project, info):
+        tmp = aclGetUsersList()
+        res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Разрешено только чтение
+    def resolve_readOnly(self: Project, info):
         return not isAdmin(info.context.user)[0] and not self.owner == info.context.user and self.owner is not None
 
 
