@@ -7,7 +7,8 @@ from dbcore.gp_catalogs_tq import CatalogsQuery
 from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatObject, ChangeOrderCatObject, \
     ChangeParentCatObjects, CopyCatObjects, UpdateProject, UpdateCostType, UpdateAgent, UpdateProjectInfo
 from dbcore.gp_finopers_tq import FinOpersQuery
-from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper, UpdateFinOper, photoAction, CreateFinOper
+from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper, UpdateFinOper, PhotoAction, CreateFinOper, \
+    UpdateBudget
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -82,7 +83,9 @@ class Mutation(graphene.ObjectType):
     # Удалить фин операцию
     delete_finoper = DeleteFinOper.Field()
     # Действия с фото фин операции
-    photo_action = photoAction.Field()
+    photo_action = PhotoAction.Field()
+    # Обновить бюджет проекта
+    update_budget = UpdateBudget.Field()
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -1299,9 +1299,13 @@
               "isDeprecated": false,
               "name": "ctList",
               "type": {
-                "kind": "OBJECT",
-                "name": "CostTypeType",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "CostTypeType",
+                  "ofType": null
+                }
               }
             },
             {
@@ -1739,13 +1743,9 @@
               "isDeprecated": false,
               "name": "id",
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
               }
             },
             {
@@ -2978,7 +2978,50 @@
               "name": "photoAction",
               "type": {
                 "kind": "OBJECT",
-                "name": "photoAction",
+                "name": "PhotoAction",
+                "ofType": null
+              }
+            },
+            {
+              "args": [
+                {
+                  "defaultValue": null,
+                  "description": null,
+                  "name": "budgetPack",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                {
+                  "defaultValue": null,
+                  "description": null,
+                  "name": "deletedPack",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                {
+                  "defaultValue": null,
+                  "description": null,
+                  "name": "projectId",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                }
+              ],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "updateBudget",
+              "type": {
+                "kind": "OBJECT",
+                "name": "UpdateBudget",
                 "ofType": null
               }
             }
@@ -3725,7 +3768,42 @@
           "inputFields": null,
           "interfaces": [],
           "kind": "OBJECT",
-          "name": "photoAction",
+          "name": "PhotoAction",
+          "possibleTypes": null
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": [
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "ok",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "result",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "kind": "OBJECT",
+          "name": "UpdateBudget",
           "possibleTypes": null
         },
         {
