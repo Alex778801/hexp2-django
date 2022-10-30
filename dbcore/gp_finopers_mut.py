@@ -98,8 +98,7 @@ class DeleteFinOper(graphene.Mutation):
         operPk = oper.pk
         operAmount = oper.amount
         oper.delete()
-        logUserAction(info.context.user, FinOper,
-                      f"delete '{operProjectPk}:{operProjectName}' ~ '{operPk} = {operAmount}'")
+        logUserAction(info.context.user, FinOper, f"delete '{operProjectPk}:{operProjectName}' ~ '{operPk} = {operAmount}'")
         # noinspection PyArgumentList
         return DeleteFinOper(ok=True, result=f"Delete {FinOper}, id={id}")
 
@@ -130,7 +129,7 @@ class CreateFinOper(graphene.Mutation):
         # oper.agentTo = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
         oper.save()
         # Журнал
-        logUserAction(info.context.user, FinOper, f"create id={oper.pk}", link=f"/finoper/{oper.pk}")
+        logUserAction(info.context.user, FinOper, f"create id={oper.pk}", diff=oper, link=f"/finoper/{oper.pk}")
         # noinspection PyArgumentList
         return CreateFinOper(ok=True, result=f"Create {FinOper}, id={oper.pk}", newOperId=oper.pk)
 
