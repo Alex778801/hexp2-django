@@ -117,6 +117,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     prefCostTypeGroupTree = graphene.String()
     ctList = graphene.List(CostTypeType)
     prefAgentGroupTree = graphene.String()
+    agList = graphene.List(AgentType)
     tree = graphene.String()
     logIntervalList = graphene.String()
     user = graphene.String()
@@ -143,6 +144,12 @@ class ProjectType(DjangoObjectType, CustomCat):
     def resolve_prefAgentGroupTree(self: Project, info):
         tmp = Agent.getGroupsTree()
         res = json.dumps(tmp, ensure_ascii=True)
+        return res
+
+    # Список агентов для выбора
+    def resolve_agList(self: Project, info):
+        res = (Agent.objects.filter(parent=self.prefAgentGroup, isGrp=False)
+              | Agent.objects.filter(parent=None, isGrp=False)).order_by('parent', 'order')
         return res
 
     # Интервалы журнала
