@@ -22,7 +22,6 @@ def report_1_header(proj):
     beginDate = now() if beginDate is None else beginDate
     endDate = now() if endDate is None else endDate
     daysDiff = abs((endDate - beginDate).days)
-    res.append({'param': 'Путь', 'value': proj.getParentsList()})
     res.append({'param': 'Дата начала', 'value': beginDate})
     res.append({'param': 'Дата конца', 'value': endDate})
     res.append({'param': 'Продолжительность', 'value': str(daysDiff) + ' дн.'})
@@ -184,14 +183,5 @@ def report001(projId):
     budget = report_1_budget(proj)
     # ---
     # Итоговый результат
-    return {
-            'proj': proj,
-            'head': head,
-            'prihps': prihps,
-            'prihps_': prihps_,
-            'rashps': rashps,
-            'rashps_': rashps_,
-            'obk': obk,
-            'detct': detct,
-            'budget': budget,
-           }
+    return {'proj': proj, 'head': head, 'prihps': prihps, 'prihps_': prihps_,
+            'rashps': rashps, 'rashps_': rashps_, 'obk': obk, 'detct': detct, 'budget': budget, }

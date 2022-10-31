@@ -22,6 +22,7 @@ from graphene_django.views import GraphQLView
 
 from dbcore.views import uploadFinOperPhoto, uploadProjectInfo
 from dj import settings
+from reports import report001, report002
 
 urlpatterns = [
     # Интерфейс администратора
@@ -31,7 +32,7 @@ urlpatterns = [
     # Загрузить фото фин операции
     path('uploadFinOperPhoto/', csrf_exempt(uploadFinOperPhoto)),
     # Загрузить объекты текстового редактора CKE из заметок проекта Project.info
-    path('uploadProjectInfo/', csrf_exempt(uploadProjectInfo))
+    path('uploadProjectInfo/', csrf_exempt(uploadProjectInfo)),
 ]
 
 # Для доступа к медиа файлам в режиме разработки
