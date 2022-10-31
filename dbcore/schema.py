@@ -9,6 +9,7 @@ from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatO
 from dbcore.gp_finopers_tq import FinOpersQuery
 from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper, UpdateFinOper, PhotoAction, CreateFinOper, \
     UpdateBudget
+from reports.gp_reports_tq import ReportsQuery
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -18,6 +19,7 @@ from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper, Upda
 class Query(
     CatalogsQuery,
     FinOpersQuery,
+    ReportsQuery,
     graphene.ObjectType
 ): pass
 
