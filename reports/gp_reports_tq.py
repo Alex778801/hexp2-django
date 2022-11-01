@@ -30,9 +30,9 @@ class ReportsQuery(graphene.ObjectType):
     report002 = graphene.String(projectId=graphene.Int(),
                                 beginDate=graphene.Int(),
                                 endDate=graphene.Int(),
-                                costType=graphene.Int(),
-                                agentFrom=graphene.Int(),
-                                agentTo=graphene.Int()
+                                costTypeId=graphene.Int(),
+                                agentFromId=graphene.Int(),
+                                agentToId=graphene.Int()
                                 )
 
     # Отчет 001
@@ -50,13 +50,13 @@ class ReportsQuery(graphene.ObjectType):
 
     # Отчет 002
     @login_required
-    def resolve_report002(self, info, projectId, beginDate=-1, endDate=-1, costType=-1, agentFrom=-1, agentTo=-1):
+    def resolve_report002(self, info, projectId, beginDate=-1, endDate=-1, costTypeId=-1, agentFromId=-1, agentToId=-1):
         project = Project.objects.get(pk=projectId)
         # -- Безопасность ACL
         canReport = aclCanReport(project, project.acl, info.context.user)[0]
         if not canReport:
             raise Exception("У вас нет прав на просмотр данного объекта!")
         # --
-        tmp = report002(projectId, beginDate, endDate, costType, agentFrom, agentTo)
+        tmp = report002(projectId, beginDate, endDate, costTypeId, agentFromId, agentToId)
         res = json.dumps(tmp, ensure_ascii=True, sort_keys=True, default=str)
         return res

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum, Min, Max, Avg, Func
@@ -8,8 +10,8 @@ from django.db.models.functions import TruncMonth
 
 from dbcore.models import Project, FinOper, Budget, CostType, Agent
 from dbcore.models_base import aclCanReport
+from dj.myutils import parseTsIntv
 
-from reports.froms import Report_2_Form
 from reports.report001 import aggCtSum
 
 
@@ -209,17 +211,16 @@ def report002(projId, beginDate=-1, endDate=-1, costType=-1, agentFrom=-1, agent
     proj = get_object_or_404(Project, pk=projId)
     if proj.isGrp:
         raise Exception('Project is NOT an Element')
-    # Значения по умолчанию
-    if endDate == -1:
-        endDate = now() + relativedelta(months=0, day=0, hour=23, minute=59, second=59, microsecond=0)
-    if beginDate == -1:
-        beginDate = endDate - relativedelta(months=0, day=1, hour=0, minute=0, second=0, microsecond=0)
-    if costType == -1:
-        costType = None
-    if agentFrom == -1:
-        agentFrom = None
-    if agentTo == -1:
-        agentTo = None
+    # Значения фильтров
+    if beginDate or endDate == -1:
+        beginDate, endDate = parseTsIntv(beginDate, endDate, proj.prefFinOperLogIntv, proj.prefFinOperLogIntv_n)
+    else:
+        beginDate = datetime.fromtimestamp(beginDate) - relativedelta(months=0, day=1, hour=0, minute=0, second=0, microsecond=0)
+        endDate = datetime.fromtimestamp(endDate) + relativedelta(months=0, day=0, hour=23, minute=59, second=59, microsecond=0)
+    costType = CostType.objects.get(pk=costType) if costType != -1 else None
+    agentFrom = Agent.objects.get(pk=agentFrom) if agentFrom != -1 else None
+    agentTo = Agent.objects.get(pk=agentTo) if agentTo != -1 else None
+    # ------------------------------------------------------------------------------------------------------------------
     # Строим отчет
     # Обороты по статьям
     moveOnCt, moveOnCt_ = report_2_moveOnCt(proj, beginDate, endDate, costType, agentFrom, agentTo)
@@ -240,6 +241,11 @@ def report002(projId, beginDate=-1, endDate=-1, costType=-1, agentFrom=-1, agent
     # Итоговый результат
     return {
         'proj': proj,
+        'head': [
+            {'param': 'Путь', 'value': proj.getParentsList()},
+            {'param': 'Начало', 'value':   beginDate},
+            {'param': 'Конец',  'value': endDate},
+        ],
         'moveOnCt': moveOnCt,
         'moveOnCt_': moveOnCt_,
         'moveOnAg': moveOnAg,
