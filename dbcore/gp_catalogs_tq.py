@@ -48,11 +48,16 @@ class CostTypeType(DjangoObjectType, CustomCat):
     class Meta:
         model = CostType
 
+    pid = graphene.Int()
     path = graphene.String()
     out = graphene.Boolean()
     user = graphene.String()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
+
+    # ИД родителя
+    def resolve_pid(self: CostType, info):
+        return self.parent_id
 
     # Путь к проекту
     def resolve_path(self: CostType, info):
@@ -83,10 +88,15 @@ class AgentType(DjangoObjectType, CustomCat):
     class Meta:
         model = Agent
 
+    pid = graphene.Int()
     path = graphene.String()
     user = graphene.String()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
+
+    # ИД родителя
+    def resolve_pid(self: CostType, info):
+        return self.parent_id
 
     # Путь к проекту
     def resolve_path(self: Agent, info):
