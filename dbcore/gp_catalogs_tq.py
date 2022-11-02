@@ -48,16 +48,12 @@ class CostTypeType(DjangoObjectType, CustomCat):
     class Meta:
         model = CostType
 
-    pid = graphene.Int()
     path = graphene.String()
     out = graphene.Boolean()
     user = graphene.String()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
 
-    # ИД родителя
-    def resolve_pid(self: CostType, info):
-        return self.parent_id
 
     # Путь к проекту
     def resolve_path(self: CostType, info):
@@ -69,7 +65,7 @@ class CostTypeType(DjangoObjectType, CustomCat):
 
     # Владелец - текстовое представление объекта owner
     def resolve_user(self: Project, info):
-        return self.owner.username
+        return self.owner.username if self.owner is not None else None
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: CostType, info):
@@ -88,15 +84,11 @@ class AgentType(DjangoObjectType, CustomCat):
     class Meta:
         model = Agent
 
-    pid = graphene.Int()
     path = graphene.String()
     user = graphene.String()
     aclList = graphene.String()
     readOnly = graphene.Boolean()
 
-    # ИД родителя
-    def resolve_pid(self: CostType, info):
-        return self.parent_id
 
     # Путь к проекту
     def resolve_path(self: Agent, info):
