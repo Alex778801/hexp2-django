@@ -8,6 +8,7 @@ from dbcore.models import Project, Agent, CostType, FinOper
 from dbcore.models_base import HierarchyOrderModelExt, aclGetUsersList, isAdmin, aclCanRead, aclCanReport
 from reports.report001 import report001
 from reports.report002 import report002
+from reports.search001 import search001
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -34,6 +35,7 @@ class ReportsQuery(graphene.ObjectType):
                                 agentFromId=graphene.Int(),
                                 agentToId=graphene.Int()
                                 )
+    search001 = graphene.String(findStr=graphene.String())
 
     # Отчет 001
     @login_required
@@ -58,5 +60,12 @@ class ReportsQuery(graphene.ObjectType):
             raise Exception("У вас нет прав на просмотр данного объекта!")
         # --
         tmp = report002(projectId, beginDate, endDate, costTypeId, agentFromId, agentToId)
+        res = json.dumps(tmp, ensure_ascii=True, sort_keys=True, default=str)
+        return res
+
+    # Поиск 001
+    @login_required
+    def resolve_search001(self, info, findStr):
+        tmp = search001(findStr, info.context.user)
         res = json.dumps(tmp, ensure_ascii=True, sort_keys=True, default=str)
         return res

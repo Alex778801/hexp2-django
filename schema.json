@@ -168,7 +168,7 @@
                 {
                   "defaultValue": null,
                   "description": null,
-                  "name": "costType",
+                  "name": "costTypeId",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
@@ -178,7 +178,7 @@
                 {
                   "defaultValue": null,
                   "description": null,
-                  "name": "agentFrom",
+                  "name": "agentFromId",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
@@ -188,7 +188,7 @@
                 {
                   "defaultValue": null,
                   "description": null,
-                  "name": "agentTo",
+                  "name": "agentToId",
                   "type": {
                     "kind": "SCALAR",
                     "name": "Int",
@@ -667,6 +667,42 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "DateTime",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "ctId",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "agFromId",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "agToId",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
