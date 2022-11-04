@@ -29,12 +29,12 @@ def search001(findStr, user):
     # Проекты
     projList = list(
         Project.objects.filter(info__icontains=findStr)
-            .values('pk', 'parent', 'order', 'name', 'info')
+            .values('id', 'parent', 'order', 'name', 'info')
             .order_by('parent', 'order')
     )
     for i in projList:
         # оформить доступ к проектам
-        proj = Project.objects.get(pk=i['pk'])
+        proj = Project.objects.get(pk=i['id'])
         i['canRead'] = aclCanRead(proj, proj.acl, user)[0]
         # подсветка поиска
         i['info'] = re.sub(F'(?i){findStr}', F'<span>{findStr}</span>', i['info'])
