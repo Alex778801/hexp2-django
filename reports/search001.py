@@ -22,22 +22,22 @@ def search001(findStr, user):
         oper = FinOper.objects.get(pk=i['operId'])
         i['canRead'] = aclCanRead(oper.project, oper.project.acl, user)[0]
         # подсветка поиска
-        i['notes'] = re.sub(F'(?i){findStr}', F'<span class="hl">{findStr}</span>', i['notes'])
+        i['notes'] = re.sub(F'(?i){findStr}', F'<span>{findStr}</span>', i['notes'])
     # Удалим объекты к которым нет права доступа
     operList = [oper for oper in operList if oper['canRead']]
     # -----------------------------------------------------------------------------------------------------------
     # Проекты
     projList = list(
         Project.objects.filter(info__icontains=findStr)
-            .values('id', 'parent', 'order', 'name', 'info')
+            .values('pk', 'parent', 'order', 'name', 'info')
             .order_by('parent', 'order')
     )
     for i in projList:
         # оформить доступ к проектам
-        proj = Project.objects.get(pk=i['id'])
+        proj = Project.objects.get(pk=i['pk'])
         i['canRead'] = aclCanRead(proj, proj.acl, user)[0]
         # подсветка поиска
-        i['info'] = re.sub(F'(?i){findStr}', F'<span class="hl">{findStr}</span>', i['info'])
+        i['info'] = re.sub(F'(?i){findStr}', F'<span>{findStr}</span>', i['info'])
     # Удалим объекты к кторым нет права доступа
     projList = [proj for proj in projList if proj['canRead']]
     # --
