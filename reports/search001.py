@@ -22,7 +22,7 @@ def search001(findStr, user):
         oper = FinOper.objects.get(pk=i['operId'])
         i['canRead'] = aclCanRead(oper.project, oper.project.acl, user)[0]
         # подсветка поиска
-        i['notes'] = re.sub(F'(?i){findStr}', F'<span>{findStr}</span>', i['notes'])
+        i['notes'] = re.sub(F'(?i){findStr}', F'<span class="hl">{findStr}</span>', i['notes'])
     # Удалим объекты к которым нет права доступа
     operList = [oper for oper in operList if oper['canRead']]
     # -----------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ def search001(findStr, user):
         proj = Project.objects.get(pk=i['id'])
         i['canRead'] = aclCanRead(proj, proj.acl, user)[0]
         # подсветка поиска
-        i['info'] = re.sub(F'(?i){findStr}', F'<span>{findStr}</span>', i['info'])
+        i['info'] = re.sub(F'(?i){findStr}', F'<span class="hl">{findStr}</span>', i['info'])
     # Удалим объекты к кторым нет права доступа
     projList = [proj for proj in projList if proj['canRead']]
     # --
