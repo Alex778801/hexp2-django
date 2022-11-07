@@ -6,12 +6,11 @@
       <paths name="deb1 - 1.207">
         <serverdata>
           <mappings>
-            <mapping deploy="/base/dj" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/hexp2/dj" local="$PROJECT_DIR$" web="/" />
           </mappings>
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/.git" />
-            <excludedPath local="true" path="$PROJECT_DIR$/.venv" />
-            <excludedPath local="true" path="$PROJECT_DIR$/db.sqlite3" />
+            <excludedPath local="true" path="$PROJECT_DIR$/media" />
           </excludedPaths>
         </serverdata>
       </paths>
