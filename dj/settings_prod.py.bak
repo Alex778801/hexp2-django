@@ -12,9 +12,10 @@ DATABASES = {
 FRONTEND_ADDR = ''
 
 # Адрес сервера бэкенда django
-BACKEND_ADDR = 'http://localhost'
+BACKEND_ADDR = 'https://hexpenses.ru:55544'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_AGE = 600
 
+DEBUG = False
