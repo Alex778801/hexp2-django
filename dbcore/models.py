@@ -12,6 +12,12 @@ from dj.myutils import LogIntv
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Системные параметры
+class SysParam(models.Model):
+    name = models.CharField(verbose_name='Название', max_length=100)
+    value = models.CharField(verbose_name='Значение', max_length=1000)
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Проекты
 class Project(HierarchyOrderModelExt, SecurityModelExt):
     name = models.CharField(verbose_name='Название', max_length=100, default='Новый проект')

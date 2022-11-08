@@ -51,3 +51,9 @@ ps aux |grep gunicorn |grep dj | awk '{ print $2 }' |xargs kill -HUP
 sudo systemctl restart nginx
 
 export PATH="$HOME/.local/bin:$PATH"
+
+-----------------------------------------------------------------------------------------------------------------------
+# !!!!!!!alex Правка исходника django для поддержки HEIC
+from pillow_heif import HeifImagePlugin
+
+django_resized/forms.py
