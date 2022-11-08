@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -14,8 +16,16 @@ FRONTEND_ADDR = ''
 # Адрес сервера бэкенда django
 BACKEND_ADDR = 'https://hexpenses.ru:55544'
 
+# Параметры сессии стандартной авторизации django
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_AGE = 600
+
+# Параметры сессии jwt авторизации graphene django
+GRAPHQL_JWT = {
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_EXPIRATION_DELTA': timedelta(minutes=15),
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=1),
+}
 
 DEBUG = False
