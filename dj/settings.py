@@ -205,5 +205,5 @@ sys.path.append(str(BASE_DIR_UP))
 try:
     from settings_prod import *
 except ImportError as e:
-    print('Import settings_prod error!')
+    print('>>> settings_prod NOT loaded!')
     pass

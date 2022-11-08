@@ -1,7 +1,16 @@
 from django.contrib import admin
 from rangefilter.filters import DateRangeFilter
 
-from .models import Project, CostType, Agent, FinOper, Photo, Budget
+from .models import Project, CostType, Agent, FinOper, Photo, Budget, SysParam
+
+
+# -----------------------------------------------------------------
+# Системные параметры
+@admin.register(SysParam)
+class UserActionAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name', 'value')
+    ordering = ['name']
+    search_fields = ('name', 'value')
 
 
 # -----------------------------------------------------------------

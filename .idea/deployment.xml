@@ -10,7 +10,6 @@
           </mappings>
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/.git" />
-            <excludedPath local="true" path="$PROJECT_DIR$/media" />
           </excludedPaths>
         </serverdata>
       </paths>

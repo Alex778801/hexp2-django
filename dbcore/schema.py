@@ -9,6 +9,7 @@ from dbcore.gp_catalogs_mut import CreateCatObject, DeleteCatObjects, RenameCatO
 from dbcore.gp_finopers_tq import FinOpersQuery
 from dbcore.gp_finopers_mut import MoveFinOper, CopyFinOper, DeleteFinOper, UpdateFinOper, PhotoAction, CreateFinOper, \
     UpdateBudget
+from dbcore.gp_sys_tq import SysQuery
 from reports.gp_reports_tq import ReportsQuery
 
 
@@ -17,6 +18,7 @@ from reports.gp_reports_tq import ReportsQuery
 # ----------------------------------------------------------------------------------------------------------------------
 
 class Query(
+    SysQuery,
     CatalogsQuery,
     FinOpersQuery,
     ReportsQuery,
@@ -50,6 +52,9 @@ class Mutation(graphene.ObjectType):
     token_auth = ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()
+    # -----------------------------------------------------
+    # СИСТЕМА
+    #
     # -----------------------------------------------------
     # КАТАЛОГИ
     # Создание объекта справочника
