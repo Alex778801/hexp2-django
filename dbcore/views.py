@@ -58,3 +58,29 @@ def uploadProjectInfo(request):
     resFileName = str(settings.MEDIA_URL) + fileName
     response = {'url': resFileName}
     return HttpResponse(json.dumps(response), content_type="json", status=200)
+
+
+# def convertMedia(request):
+#     buf = ''
+#     workDir = '/Users/alexeysorokin/Desktop/hexp2/media/'
+#     workDir = '/home/user/hexp2/media/'
+#     photo = Photo.objects.all()
+#     for ph in photo:
+#         # Старое имя
+#         oldFn = str(ph.image)
+#         # Новое имя
+#         name, ext = os.path.splitext(oldFn)
+#         rand = random.randrange(100000000000, 900000000000, 1)
+#         newName = f'{ph.finOper.project_id}-{ph.finOper_id}-{rand}'
+#         newFn = f'{settings.FINOPER_PHOTO_DIR}/{newName}{ext}'
+#         # Переименование
+#         renOld = workDir + oldFn
+#         renNew = workDir + newFn
+#         os.rename(renOld, renNew)
+#         ph.image = newFn
+#         ph.save()
+#         # Инфо
+#         tmp = f'{renOld} -> {renNew}\n'
+#         print(tmp)
+#         buf += tmp
+#     return HttpResponse(buf, content_type="text", status=200)

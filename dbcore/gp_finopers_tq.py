@@ -44,6 +44,10 @@ class FinOperType(DjangoObjectType):
 
     ts = graphene.Int()
     tsjs = graphene.DateTime()
+    ctId = graphene.Int()
+    agFromId = graphene.Int()
+    agToId = graphene.Int()
+    ownerId = graphene.Int()
     user = graphene.String()
     ucol = graphene.String()
     amount = graphene.Int()
@@ -61,6 +65,22 @@ class FinOperType(DjangoObjectType):
     # Метка времени операции в формате js
     def resolve_tsjs(self: FinOper, info):
         return self.moment
+
+    # Ид статьи
+    def resolve_ctId(self: FinOper, info):
+        return self.costType_id
+
+    # Ид агента откуда
+    def resolve_agFromId(self: FinOper, info):
+        return self.agentFrom_id
+
+    # Ид агента куда
+    def resolve_agToId(self: FinOper, info):
+        return self.agentTo_id
+
+    # Ид владельца операции
+    def resolve_ownerId(self: FinOper, info):
+        return self.owner_id
 
     # Владелец операции
     def resolve_user(self: FinOper, info):

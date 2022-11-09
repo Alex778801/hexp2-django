@@ -29,6 +29,13 @@ ALTER ROLE hexp2user SET default_transaction_isolation TO 'read committed';
 ALTER ROLE hexp2user SET timezone TO ‘Europe/Moscow’;
 GRANT ALL PRIVILEGES ON DATABASE hexp2 TO hexp2user;
 
+CREATE USER demouser WITH PASSWORD '16384valpha';
+ALTER ROLE demouser SET client_encoding TO 'utf8';
+ALTER ROLE demouser SET default_transaction_isolation TO 'read committed';
+ALTER ROLE demouser SET timezone TO 'Europe/Moscow';
+GRANT ALL PRIVILEGES ON DATABASE demo TO demouser;
+
+
 —
 
 pip freeze > requirements.txt

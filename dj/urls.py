@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.template.defaulttags import url
-from django.urls import path
+from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
@@ -33,7 +33,13 @@ urlpatterns = [
     path('uploads/uploadFinOperPhoto/', csrf_exempt(uploadFinOperPhoto)),
     # Загрузить объекты текстового редактора CKE из заметок проекта Project.info
     path('uploads/uploadProjectInfo/', csrf_exempt(uploadProjectInfo)),
+    # Утилита переименования старых медиа файлов в новый формат
+    # path('beutils/cm/', csrf_exempt(convertMedia)),
 ]
+###!!!
+
+# Профилировщик silk
+urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
 
 # Для доступа к медиа файлам в режиме разработки
 if settings.DEBUG:

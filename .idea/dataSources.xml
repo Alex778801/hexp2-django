@@ -13,19 +13,5 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="postgres DURN" uuid="06670319-851c-499a-ab09-fb51cbef58fe">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://192.168.1.207:5432/durn</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="postgres DEMO" uuid="db555fb4-de96-4a3d-8ebd-075ef87b0c76">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://192.168.1.207:5432/demo</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
   </component>
 </project>

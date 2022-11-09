@@ -14,7 +14,6 @@ import random
 class UserAttr(models.Model):
     user = models.OneToOneField(User, verbose_name='Пользователь', on_delete=models.CASCADE, primary_key=True)
     color = models.CharField(verbose_name='Цвет', max_length=7, blank=False, null=False, default='#75dfff')
-    openObjectsInNewWindow = models.BooleanField(verbose_name='Открывать объекты в новом окне', blank=False, null=False, default=False)
 
     class Meta:
         verbose_name = 'Атрибуты пользователей'

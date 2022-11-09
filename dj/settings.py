@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "rangefilter",
     "graphene_django",
     "corsheaders",
+    "silk",
 
     "ua",
     "dbcore",
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "silk.middleware.SilkyMiddleware",
 ]
 
 ROOT_URLCONF = "dj.urls"
@@ -196,9 +198,14 @@ FINOPER_PHOTO_DIR = 'finoper_photo'
 # Папка в MEDIA с объектами редатора CKE
 PROJECT_INFO_DIR = 'projectinfo_media'
 
+# Трассировщик производительности
+SILKY_INTERCEPT_PERCENT = 0
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
+
 
 sys.path.append(str(BASE_DIR_UP))
 

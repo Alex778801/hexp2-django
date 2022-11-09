@@ -24,7 +24,7 @@ class UserAttrForm(ModelForm):
 
 @admin.register(UserAttr)
 class UserAttrAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'user', 'color', 'color2', 'openObjectsInNewWindow')
+    list_display = ('pk', 'user', 'color', 'color2')
     ordering = ('user', )
     list_filter = ('user', )
     search_fields = ('user__icontains', )
