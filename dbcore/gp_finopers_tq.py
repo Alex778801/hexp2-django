@@ -47,6 +47,7 @@ class FinOperType(DjangoObjectType):
     ctId = graphene.Int()
     agFromId = graphene.Int()
     agToId = graphene.Int()
+    ownerId = graphene.Int()
     user = graphene.String()
     ucol = graphene.String()
     amount = graphene.Int()
@@ -76,6 +77,10 @@ class FinOperType(DjangoObjectType):
     # Ид агента куда
     def resolve_agToId(self: FinOper, info):
         return self.agentTo_id
+
+    # Ид владельца операции
+    def resolve_ownerId(self: FinOper, info):
+        return self.owner_id
 
     # Владелец операции
     def resolve_user(self: FinOper, info):
