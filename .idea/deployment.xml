@@ -6,7 +6,7 @@
       <paths name="deb1 - 1.207">
         <serverdata>
           <mappings>
-            <mapping deploy="/hexp2/dj" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/base/dj" local="$PROJECT_DIR$" web="/" />
           </mappings>
           <excludedPaths>
             <excludedPath local="true" path="$PROJECT_DIR$/.git" />
