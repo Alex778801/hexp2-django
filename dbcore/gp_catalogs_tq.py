@@ -96,7 +96,7 @@ class AgentType(DjangoObjectType, CustomCat):
 
     # Владелец - текстовое представление объекта owner
     def resolve_user(self: Project, info):
-        return self.owner.username
+        return self.owner.username if self.owner is not None else None
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: Agent, info):
@@ -162,8 +162,7 @@ class ProjectType(DjangoObjectType, CustomCat):
 
     # Владелец - текстовое представление объекта owner
     def resolve_user(self: Project, info):
-        return self.owner.username
-
+        return self.owner.username if self.owner is not None else None
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: Project, info):
@@ -227,6 +226,7 @@ class CatalogsQuery(graphene.ObjectType):
         else:
             return CostType.objects.filter(parent_id=pid)
 
+    @login_required
     # Дерево групп и элементов Проектов
     def resolve_projectsTree(self, info):
         tmp = Project.getGroupsElemsTree()
