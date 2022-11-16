@@ -2,36 +2,58 @@ import os
 import random
 
 import graphql_jwt
+import jwt
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 import requests
 import json
 
+from graphql_jwt.settings import jwt_settings
+
 from dbcore.models import Photo, FinOper, Project
 from dbcore.models_base import aclCanMod
 from dj import settings
 
+
 # Проверить валидность токена авторизации
 def checkJwtToken(token):
-    query = "mutation VerifyToken($token: String!) { verifyToken(token: $token) { payload } }"
-    url = f'{settings.BACKEND_ADDR}/gp/'
-    res = requests.post(url, json={'query': query, 'variables': {'token': token}}).text
-    return 'error' not in res and 'payload' in res
+    try:
+        res = jwt.decode(
+            token,
+            jwt_settings.JWT_PUBLIC_KEY or jwt_settings.JWT_SECRET_KEY,
+            options={
+                "verify_exp": jwt_settings.JWT_VERIFY_EXPIRATION,
+                "verify_aud": jwt_settings.JWT_AUDIENCE is not None,
+                "verify_signature": jwt_settings.JWT_VERIFY,
+            },
+            leeway=jwt_settings.JWT_LEEWAY,
+            audience=jwt_settings.JWT_AUDIENCE,
+            issuer=jwt_settings.JWT_ISSUER,
+            algorithms=[jwt_settings.JWT_ALGORITHM],
+        )
+        user = User.objects.get(username=res['username'])
+    except:
+        return False, None
+    return True, user
+    # query = "mutation VerifyToken($token: String!) { verifyToken(token: $token) { payload } }"
+    # url = f'{settings.BACKEND_ADDR}/gp/'
+    # res = requests.post(url, json={'query': query, 'variables': {'token': token}}).text
+    # return 'error' not in res and 'payload' in res
+
 
 # Загрузить фото фин операции
 def uploadFinOperPhoto(request):
     token = request.POST['token']
-    ownerId = int(request.POST['ownerId'])
     operId = int(request.POST['operId'])
     # --
-    owner = User.objects.get(pk=ownerId)
     oper = FinOper.objects.get(pk=operId)
     # -- Безопасность токена JWT
-    if not checkJwtToken(token):
+    tokenCheck, user = checkJwtToken(token)
+    if not tokenCheck:
         raise Exception("Токен авторизации не действителен!")
     # -- Безопасность ACL
-    canMod = aclCanMod(oper, oper.project.acl, owner)[0]
+    canMod = aclCanMod(oper, oper.project.acl, user)[0]
     if not canMod:
         raise Exception("У вас нет прав на модификацию данного объекта!")
     # --
@@ -46,7 +68,8 @@ def uploadProjectInfo(request):
     token = request.POST['token']
     projectId = int(request.POST['projectId'])
     # -- Безопасность токена JWT
-    if not checkJwtToken(token):
+    tokenCheck, user = checkJwtToken(token)
+    if not tokenCheck:
         raise Exception("Токен авторизации не действителен!")
     # --
     file = request.FILES['file']
@@ -58,7 +81,6 @@ def uploadProjectInfo(request):
     resFileName = str(settings.MEDIA_URL) + fileName
     response = {'url': resFileName}
     return HttpResponse(json.dumps(response), content_type="json", status=200)
-
 
 # def convertMedia(request):
 #     buf = ''

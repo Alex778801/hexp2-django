@@ -21,7 +21,7 @@ BASE_DIR_UP = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-y!t)w)^$lbo&pbj(#u^lw^t44s$bu$tqve0()gzahquvsh0ym="
+SECRET_KEY = "django-insecure-jn5@#(64m-r(%*b_97+-&*6ip1xf7%ycxi3u96)g+_tf8%jq16"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -109,6 +109,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_PASSWORD_VALIDATORS = []
+
+SESSION_EXPIREOD_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 600
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -204,6 +208,8 @@ PROJECT_INFO_DIR = 'projectinfo_media'
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
+WSGI_APPLICATION = "dj.wsgi_durn.application"
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -214,11 +220,14 @@ DATABASES = {
     }
 }
 
+# Главая папка Медиа
+MEDIA_ROOT = '/home/user/durn/media/'
+
 # Адрес сервера фронтенда vue
 FRONTEND_ADDR = ''
 
 # Адрес сервера бэкенда django
-BACKEND_ADDR = 'https://hexpenses.ru:55544'
+BACKEND_ADDR = ''
 
 # Параметры сессии стандартной авторизации django
 SESSION_EXPIREOD_AT_BROWSER_CLOSE = True

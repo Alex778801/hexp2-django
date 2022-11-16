@@ -110,6 +110,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_PASSWORD_VALIDATORS = []
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 600
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -209,10 +213,10 @@ SILKY_INTERCEPT_PERCENT = 0
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-sys.path.append(str(BASE_DIR_UP))
-
-try:
-    from settings_prod import *
-except ImportError as e:
-    print('>>> settings_prod NOT loaded!')
-    pass
+# sys.path.append(str(BASE_DIR_UP))
+#
+# try:
+#     from settings_prod import *
+# except ImportError as e:
+#     print('>>> settings_prod NOT loaded!')
+#     pass
