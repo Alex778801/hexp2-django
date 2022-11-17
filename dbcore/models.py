@@ -125,6 +125,8 @@ class FinOper(SecurityModelExt):
 # Формирование имени файла фото
 def getPhotoLocation(instance, filename):
     name, ext = os.path.splitext(filename)
+    if ext == '':
+        ext = '.jpg'
     rand = random.randrange(100000000000, 900000000000, 1)
     newName = f'{instance.finOper.project_id}-{instance.finOper_id}-{rand}'
     return f'{settings.FINOPER_PHOTO_DIR}/{newName}{ext}'
