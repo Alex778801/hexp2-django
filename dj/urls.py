@@ -21,7 +21,8 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
 from dbcore.views import uploadFinOperPhoto, uploadProjectInfo
-from dj import settings
+
+from django.conf import settings
 from reports import report001, report002
 
 urlpatterns = [
