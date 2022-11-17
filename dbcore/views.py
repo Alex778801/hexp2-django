@@ -37,10 +37,6 @@ def checkJwtToken(token):
     except:
         return False, None
     return True, user
-    # query = "mutation VerifyToken($token: String!) { verifyToken(token: $token) { payload } }"
-    # url = f'{settings.BACKEND_ADDR}/gp/'
-    # res = requests.post(url, json={'query': query, 'variables': {'token': token}}).text
-    # return 'error' not in res and 'payload' in res
 
 
 # Загрузить фото фин операции
@@ -78,7 +74,6 @@ def uploadProjectInfo(request):
     rand = random.randrange(100000000000, 900000000000, 1)
     newName = f'{projectId}-{rand}'
     fileName = default_storage.save(f'{settings.PROJECT_INFO_DIR}/{newName}{ext}', file)
-    # resFileName = settings.BACKEND_ADDR + str(settings.MEDIA_URL) + fileName
     resFileName = str(settings.MEDIA_URL) + fileName
     response = {'url': resFileName}
     return HttpResponse(json.dumps(response), content_type="json", status=200)
