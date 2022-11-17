@@ -19,12 +19,6 @@ DATABASES = {
 # Главая папка Медиа
 MEDIA_ROOT = '/home/user/durn/media/'
 
-# Адрес сервера фронтенда vue
-FRONTEND_ADDR = ''
-
-# Адрес сервера бэкенда django
-BACKEND_ADDR = ''
-
 # Параметры сессии стандартной авторизации django
 SESSION_EXPIREOD_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True

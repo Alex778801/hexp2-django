@@ -240,7 +240,7 @@ class PhotoAction(graphene.Mutation):
             photo.image = localName
             photo.save()
             # --
-        logUserAction(info.context.user, Photo, f"photo {actionsList[action]}, id={id}", link=f"/finoper/{photo.finOper.project_id}")
+        logUserAction(info.context.user, Photo, f"photo {actionsList[action]}, id={id}", link=f"/finoper/{photo.finOper_id}")
         # noinspection PyArgumentList
         return PhotoAction(ok=True, result=f"photo action {actionsList[action]}, id={id}")
 
