@@ -17,8 +17,6 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR_UP = Path(__file__).resolve().parent.parent.parent
 
-print(BASE_DIR_UP)
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -206,17 +204,3 @@ PROJECT_INFO_DIR = 'projectinfo_media'
 
 # Трассировщик производительности
 SILKY_INTERCEPT_PERCENT = 0
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-# sys.path.append(str(BASE_DIR_UP))
-#
-# try:
-#     from settings_prod import *
-# except ImportError as e:
-#     print('>>> settings_prod NOT loaded!')
-#     pass
