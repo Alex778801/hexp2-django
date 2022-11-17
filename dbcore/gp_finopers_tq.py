@@ -110,7 +110,7 @@ class FinOperType(DjangoObjectType):
 
     # Список фото
     def resolve_photoList(self: FinOper, info):
-        return Photo.objects.filter(finOper=self)
+        return Photo.objects.filter(finOper=self).order_by('pk')
 
     # Список статей для выбора
     def resolve_ctList(self: FinOper, info):

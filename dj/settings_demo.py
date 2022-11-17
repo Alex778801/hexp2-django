@@ -35,4 +35,4 @@ GRAPHQL_JWT = {
 # Профилировщик silk - отключение перехвата запросов
 SILKY_INTERCEPT_PERCENT = 0
 
-#DEBUG = False
+DEBUG = False
