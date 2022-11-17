@@ -1,9 +1,4 @@
-select finopers.finopers, project.project, costTypes.costTypes, agents.agents, users.users
-from
-
 -- finopers
-(select json_agg(t) as finopers
-from (
 select
     finoper.id as id,
     extract(epoch from moment) as ts,
@@ -16,21 +11,17 @@ select
     count(photo.id)
 from dbcore_finoper as finoper
 left join dbcore_photo photo on finoper.id = photo."finOper_id"
-where project_id=322
-group by finoper.id) t) finopers,
+group by finoper.id;
+
 
 -- project
-(select json_agg(t) as project
-from (
 select
     id,
     name
-from dbcore_project
-where id=322) t) project,
+from dbcore_project;
+
 
 -- costTypes
-(select json_agg(t) as costTypes
-from (
 select
     id,
     coalesce(parent_id, -1) as pid,
@@ -38,19 +29,21 @@ select
     name,
     "isOutcome" as out,
     color
-from dbcore_costtype) t) costTypes,
+from dbcore_costtype;
+
 
 -- agents
-(select json_agg(t) as agents
-from (select coalesce(parent_id, -1) as pid,
-             "order"                 as ord,
-             name
-      from dbcore_agent) t) agents,
+select
+    coalesce(parent_id, -1) as pid,
+    "order" as ord,
+    name
+from dbcore_agent;
+
 
 -- users
-(select json_agg(t) as users
-from (select us.id as id,
-             username,
-             color
-      from auth_user as us
-               left join ua_userattr ua on us.id = ua.user_id) t) users
+select
+    us.id as id,
+    username,
+    color
+from auth_user as us
+left join ua_userattr ua on us.id = ua.user_id;
