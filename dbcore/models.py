@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 from django_resized import ResizedImageField
 from django.utils import timezone
 
-from dj import settings
-from .models_base import *
+from django.conf import settings
 
+from .models_base import *
 from dj.myutils import LogIntv
 
 

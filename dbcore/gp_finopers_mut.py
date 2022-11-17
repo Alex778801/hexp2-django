@@ -6,11 +6,11 @@ import graphene
 from graphql_jwt.decorators import login_required
 import piexif
 
+from django.conf import settings
 
 from django.contrib.auth.models import User
 from dbcore.models import Project, Agent, CostType, FinOper, Photo, getPhotoLocation, Budget
 from dbcore.models_base import isAdmin, aclCanRead, aclCanMod, aclCanCrt
-from dj import settings
 from ua.models import logUserAction, modelDiff
 
 

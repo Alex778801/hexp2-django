@@ -13,7 +13,8 @@ from graphql_jwt.settings import jwt_settings
 
 from dbcore.models import Photo, FinOper, Project
 from dbcore.models_base import aclCanMod
-from dj import settings
+
+from django.conf import settings
 
 
 # Проверить валидность токена авторизации
