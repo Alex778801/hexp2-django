@@ -154,14 +154,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ***********************************************************************
 
-# Resize image fields
-DJANGORESIZED_DEFAULT_SIZE = [1920, 1080]
-DJANGORESIZED_DEFAULT_QUALITY = 90
-DJANGORESIZED_DEFAULT_KEEP_META = True
-DJANGORESIZED_DEFAULT_FORCE_FORMAT = 'JPEG'
-DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
-DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = False
-
 # GRAPHENE
 GRAPHENE = {
     'SCHEMA': 'dbcore.schema.schema',
