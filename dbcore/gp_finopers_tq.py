@@ -178,7 +178,7 @@ class FinOpersQuery(graphene.ObjectType):
         return FinOper.objects.filter(project=project, moment__gte=tsBegin, moment__lte=tsEnd)
 
     # Журнал фин операций проекта SQL
-    # @login_required
+    @login_required
     def resolve_finopersSQL(self, info, projectId, tsBegin, tsEnd):
         project = Project.objects.get(pk=projectId)
         # -- Безопасность ACL
