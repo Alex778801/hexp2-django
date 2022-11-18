@@ -3,6 +3,7 @@ from enum import Enum
 import graphene
 from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
+from django.db import connection
 
 from dbcore.gp_catalogs_tq import CostTypeType, AgentType, ProjectType
 from dbcore.models import Project, Agent, CostType, FinOper, Photo, Budget
@@ -150,6 +151,7 @@ class BudgetLineType(DjangoObjectType):
 class FinOpersQuery(graphene.ObjectType):
     finoper = graphene.Field(FinOperType, id=graphene.Int())
     finopers = graphene.List(FinOperType, projectId=graphene.Int(), tsBegin=graphene.Int(), tsEnd=graphene.Int())
+    finopersSQL = graphene.String(projectId=graphene.Int(), tsBegin=graphene.Int(), tsEnd=graphene.Int())
     budget = graphene.List(BudgetLineType, projectId=graphene.Int())
 
     # Финансовая операция
@@ -163,7 +165,6 @@ class FinOpersQuery(graphene.ObjectType):
         # --
         return oper
 
-
     # Журнал фин операций проекта
     @login_required
     def resolve_finopers(self, info, projectId, tsBegin, tsEnd):
@@ -175,6 +176,92 @@ class FinOpersQuery(graphene.ObjectType):
         # --
         tsBegin, tsEnd = parseTsIntv(tsBegin, tsEnd, project.prefFinOperLogIntv, project.prefFinOperLogIntv_n)
         return FinOper.objects.filter(project=project, moment__gte=tsBegin, moment__lte=tsEnd)
+
+    # Журнал фин операций проекта SQL
+    # @login_required
+    def resolve_finopersSQL(self, info, projectId, tsBegin, tsEnd):
+        project = Project.objects.get(pk=projectId)
+        # -- Безопасность ACL
+        canRead = aclCanRead(project, project.acl, info.context.user)[0]
+        if not canRead:
+            raise Exception("У вас нет прав на просмотр данного объекта!")
+        # --
+        tsBegin, tsEnd = parseTsIntv(tsBegin, tsEnd, project.prefFinOperLogIntv, project.prefFinOperLogIntv_n)
+
+        SQL = f'''
+            select finopers.finopers, project.project, costTypes.costTypes, agents.agents, users.users
+            from
+            
+            -- finopers
+            (select json_agg(t) as finopers
+            from (
+            select
+                finoper.id as id,
+                extract(epoch from moment) as ts,
+                "costType_id" as "ctId",
+                "agentFrom_id" as "agFromId",
+                "agentTo_id" as "agToId",
+                owner_id as "ownerId",
+                amount,
+                notes,
+                count(photo.id) as pq
+            from dbcore_finoper as finoper
+            left join dbcore_photo photo on finoper.id = photo."finOper_id"
+            where project_id={projectId} and moment >= '{tsBegin}' and moment <= '{tsEnd}'
+            group by finoper.id) t) finopers,
+            
+            -- project
+            (select json_agg(t) as project
+            from (
+            select
+                id,
+                name
+            from dbcore_project
+            where id={projectId}) t) project,
+            
+            -- costTypes
+            (select json_agg(t) as costTypes
+            from (
+            select
+                id,
+                coalesce(parent_id, -1) as pid,
+                "order" as ord,
+                name,
+                "isOutcome" as out,
+                color
+            from dbcore_costtype) t) costTypes,
+            
+            -- agents
+            (select json_agg(t) as agents
+            from (
+            select
+                id,
+                coalesce(parent_id, -1) as pid,
+                "order" as ord,
+                name
+            from dbcore_agent) t) agents,
+            
+            -- users
+            (select json_agg(t) as users
+            from (
+            select
+                us.id as id,
+                username,
+                color
+            from auth_user as us
+            left join ua_userattr ua on us.id = ua.user_id) t) users
+        '''
+        with connection.cursor() as cursor:
+            cursor.execute(SQL)
+            row = cursor.fetchone()
+        res = json.dumps({
+            'finopers': row[0],
+            'project': row[1],
+            'costTypes': row[2],
+            'agents': row[3],
+            'users': row[4],
+        }, ensure_ascii=True)
+        return res
 
     # Бюджет проекта
     @login_required
