@@ -1,8 +1,12 @@
+from django.core.management.utils import get_random_secret_key
+
 from dj.settings import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-SECRET_KEY = "django-insecure-keurhx3%020a*z*%72!7_x@n)&k0hid-$e#4&-d&@*&g-k3%v-"
+# SECRET_KEY = "django-insecure-keurhx3%020a*z*%72!7_x@n)&k0hid-$e#4&-d&@*&g-k3%v-"
+with open('/home/user/durn/django-key.txt') as f:
+    SECRET_KEY = f.read().strip()
 
 WSGI_APPLICATION = "dj.wsgi_durn.application"
 
