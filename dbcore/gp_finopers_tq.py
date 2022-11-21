@@ -215,7 +215,8 @@ class FinOpersQuery(graphene.ObjectType):
             from (
             select
                 id,
-                name
+                name,
+                path(parent_id, 'dbcore_project')
             from dbcore_project
             where id={projectId}) t) project,
             
