@@ -64,3 +64,9 @@ export PATH="$HOME/.local/bin:$PATH"
 from pillow_heif import HeifImagePlugin
 
 django_resized/forms.py
+
+-----------------------------------------------------------------------------------------------------------------------
+
+git rm --cached db.sqlite3
+git filter-branch --tree-filter 'rm -f db.sqlite3' HEAD
+
