@@ -64,7 +64,7 @@ class CostTypeType(DjangoObjectType, CustomCat):
 
     # Владелец - текстовое представление объекта owner
     def resolve_user(self: Project, info):
-        return self.owner.username
+        return self.owner.username if self.owner is not None else None
 
     # Список пользователей и служебных записей авторизации
     def resolve_aclList(self: CostType, info):

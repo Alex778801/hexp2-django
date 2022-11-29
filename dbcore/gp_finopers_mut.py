@@ -124,7 +124,7 @@ class CreateFinOper(graphene.Mutation):
         oper = FinOper()
         oper.project = project
         oper.owner = info.context.user
-        oper.costType = CostType.objects.filter(parent=project.prefCostTypeGroup).order_by('order').first()
+        # oper.costType = CostType.objects.filter(parent=project.prefCostTypeGroup).order_by('order').first()
         # oper.agentFrom = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
         # oper.agentTo = Agent.objects.filter(parent=project.prefAgentGroup).order_by('order').first()
         oper.save()
@@ -265,23 +265,23 @@ class UpdateBudget(graphene.Mutation):
         # Создадим новые и обновим существующие
         budgets = json.loads(budgetPack)
         for budgetLine in budgets:
-            if budgetLine['id'] == -1:
+            if budgetLine['id'] <= -1:
                 budget = Budget()
                 budget.project = project
             else:
                 budget = Budget.objects.get(pk=budgetLine['id'])
-            budget.costType_id = budgetLine['costType']['id']
+            budget.costType_id = budgetLine['costTypeId']
             budget.order = budgetLine['order']
             budget.amount = budgetLine['amount']
             budget.notes = budgetLine['notes']
             # Журнал - обновление
-            if budgetLine['id'] != -1:
+            if budgetLine['id'] > -1:
                 diff = modelDiff(Budget.objects.get(pk=budget.pk), budget)
                 if diff != '':
                     logUserAction(info.context.user, Budget, f"update budget, id={budget.pk}", diff=diff, link=f"/budget/{projectId}")
             budget.save()
             # Журнал - новый
-            if budgetLine['id'] == -1:
+            if budgetLine['id'] <= -1:
                 logUserAction(info.context.user, Budget, f"new budget, id={budget.pk}", diff=budget, link=f"/budget/{projectId}")
         # Удалим помеченные на удаление
         deletes = json.loads(deletedPack)
