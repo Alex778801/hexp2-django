@@ -181,6 +181,8 @@ class Budget(models.Model):
     @receiver(pre_delete)
     def afterDelete(sender, instance, using, **kwargs):
         pass
+        #
+        #
         # Пересчет порядкового номера при удалении выполняет фронтенд
         # if sender == Budget:
         #     recs = Budget.objects.filter(project=instance.project, costType=instance.costType, order__gt=instance.order)
