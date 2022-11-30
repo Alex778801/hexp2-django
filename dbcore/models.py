@@ -180,12 +180,13 @@ class Budget(models.Model):
     # После удаления - пересчитаем порядки элементов, следующих за удаляемым
     @receiver(pre_delete)
     def afterDelete(sender, instance, using, **kwargs):
-        if sender != Budget:
-            return
-        recs = Budget.objects.filter(project=instance.project, costType=instance.costType, order__gt=instance.order)
-        for r in recs:
-            r.order -= 1
-            r.save()
+        pass
+        # Пересчет порядкового номера при удалении выполняет фронтенд
+        # if sender == Budget:
+        #     recs = Budget.objects.filter(project=instance.project, costType=instance.costType, order__gt=instance.order)
+        #     for r in recs:
+        #         r.order -= 1
+        #         r.save()
 
     # Сменить порядок элемента (переместить элемент)
     def changeOrder(self, toOrder):
