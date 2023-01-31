@@ -1538,22 +1538,6 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
-              "name": "agList",
-              "type": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "AgentType",
-                  "ofType": null
-                }
-              }
-            },
-            {
-              "args": [],
-              "deprecationReason": null,
-              "description": null,
-              "isDeprecated": false,
               "name": "tree",
               "type": {
                 "kind": "SCALAR",

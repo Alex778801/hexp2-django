@@ -116,6 +116,7 @@ class ProjectType(DjangoObjectType, CustomCat):
     path = graphene.String()
     prefCostTypeGroupTree = graphene.String()
     ctList = graphene.List(CostTypeType)
+    agList = graphene.List(AgentType)
     prefAgentGroupTree = graphene.String()
     tree = graphene.String()
     logIntervalList = graphene.String()
