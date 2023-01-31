@@ -36,7 +36,7 @@ class FinOperPhotoType(DjangoObjectType):
     class Meta:
         model = Photo
 
-
+# ----------------------------------------------------------------------------------------------------------------------
 # Финансовая операция
 class FinOperType(DjangoObjectType):
     class Meta:
@@ -126,7 +126,7 @@ class FinOperType(DjangoObjectType):
         # return Agent.objects.filter(parent=self.project.prefAgentGroup)
         return res
 
-
+# ----------------------------------------------------------------------------------------------------------------------
 # Позиция бюджета
 class BudgetLineType(DjangoObjectType):
 
@@ -142,10 +142,10 @@ class BudgetLineType(DjangoObjectType):
     def resolve_amount(self: Budget, info):
         return int(self.amount) if self.amount is not None else None
 
-    # ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
 # ЗАПРОСЫ
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 class FinOpersQuery(graphene.ObjectType):
     finoper = graphene.Field(FinOperType, id=graphene.Int())
@@ -186,3 +186,6 @@ class FinOpersQuery(graphene.ObjectType):
             raise Exception("У вас нет прав на просмотр данного объекта!")
         # --
         return Budget.objects.filter(project=project)
+
+
+

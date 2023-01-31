@@ -195,13 +195,13 @@ SILKY_INTERCEPT_PERCENT = 0
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'HOST': '192.168.1.207',
-#         'PORT': '',
-#         'NAME': 'durn',
-#         'USER': 'durnuser',
-#         'PASSWORD': 'x1941ab17v',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': '192.168.1.207',
+        'PORT': '',
+        'NAME': 'durn',
+        'USER': 'durnuser',
+        'PASSWORD': 'x1941ab17v',
+    }
+}
